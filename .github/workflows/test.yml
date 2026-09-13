@@ -1,0 +1,28 @@
+name: Test
+
+# The suites are synthetic payloads fed to hooks/nudge.sh, so a green run here
+# proves the matcher and says nothing about whether Claude Code delivers those
+# payloads on those events. Delivery is settled by typing the command in a live
+# session; see AGENTS.md.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  suites:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+      - name: test suites
+        run: |
+          for t in scripts/tests/*.test.sh; do echo "== $t =="; bash "$t"; done

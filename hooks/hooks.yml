@@ -1,0 +1,22 @@
+# Source of record for mate's hooks — shipyard generates hooks.json.
+#
+# nudge.sh takes two registrations because a skill invocation arrives in two
+# shapes: the agent invokes it and it is a `Skill` tool call; the user types it
+# and it is a prompt with no tool call at all. Registering either one alone
+# leaves the other silent, and typed is the shape a human uses.
+#
+# react.sh takes the third, on `Bash`, because the suite announces what it did
+# on a command's stdout. That reaches a subscriber only through the tool call
+# that printed it.
+hooks:
+  - event: PostToolUse
+    matcher: Skill
+    command: 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/nudge.sh"'
+    description: Names the phase that follows the one just entered, as one line the user acts on or ignores.
+  - event: UserPromptSubmit
+    command: 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/nudge.sh"'
+    description: Names the phase that follows the one just entered, as one line the user acts on or ignores.
+  - event: PostToolUse
+    matcher: Bash
+    command: 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/react.sh"'
+    description: Names what a change request still needs once anchor reports the draft flag came off.

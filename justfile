@@ -1,0 +1,46 @@
+# shipyard runs from its git ref, with no checkout and no install. CI is the
+# writer for what lands; these recipes are for seeing the projection first.
+shipyard := "uvx --from 'git+https://github.com/chris-peterson/shipyard@v2' shipyard"
+
+default:
+    @just --list
+
+# run the shell script test suite
+test:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for t in scripts/tests/*.test.sh; do echo "== $t =="; bash "$t"; done
+
+# project source into the generated artifacts (plugin.json, hooks.json, describe, docs)
+generate:
+    {{shipyard}} generate
+
+# read what the projection job would commit, without keeping it; `git restore .` discards
+check:
+    {{shipyard}} generate
+    git --no-pager diff --stat
+
+# preview the docsify docs site locally
+docs:
+    {{shipyard}} build-docs
+    docsify serve docs --open
+
+# regenerate .claude-plugin/plugin.json from plugin.yml (the canonical descriptor)
+plugin-json:
+    {{shipyard}} gen-plugin-json
+
+# resync plugin.yml suite.describe from the hooks and skills sources
+describe:
+    {{shipyard}} gen-describe
+
+# feed the nudge hook one payload and print what it says back
+nudge PAYLOAD:
+    @printf '%s' '{{PAYLOAD}}' | bash hooks/nudge.sh
+
+# feed the react hook one anchor announcement and print what it says back
+react ANNOUNCEMENT:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    jq -nc --arg o '{{ANNOUNCEMENT}}' --arg s "just-$$" \
+      '{session_id:$s,tool_name:"Bash",tool_response:{stdout:$o}}' \
+      | bash hooks/react.sh
