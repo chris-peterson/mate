@@ -1,0 +1,14 @@
+# Source of record for mate's hooks — shipyard generates hooks.json.
+#
+# One script, two registrations. A skill invoked by the agent arrives as a
+# `Skill` tool call; a skill the user typed arrives as a prompt and fires no
+# tool call at all. Registering either one alone leaves the other silent, and
+# typed is the shape a human uses.
+hooks:
+  - event: PostToolUse
+    matcher: Skill
+    command: 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/nudge.sh"'
+    description: Names the phase that follows the one just entered, as one line the user acts on or ignores.
+  - event: UserPromptSubmit
+    command: 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/nudge.sh"'
+    description: Names the phase that follows the one just entered, as one line the user acts on or ignores.

@@ -1,0 +1,77 @@
+# Canonical descriptor for the mate plugin — edit here, never plugin.json.
+# shipyard's project job projects this into .claude-plugin/plugin.json and the
+# marketplace SPA (the suite: block), and commits the result to the branch.
+
+name: mate
+version: 0.1.0
+description: The two skills that make the change — /fix for a defect, /feature for a capability — plus a hook that names the phase you are about to enter next.
+author: chris-peterson
+repository: https://github.com/chris-peterson/mate
+keywords: [fix, feature, debugging, tdd, refine, workflow, claude-code]
+license: MIT
+
+validate:
+  accept:
+    - warning: root
+      path: CLAUDE.md
+      because: >-
+        CLAUDE.md at the root is this repo's own agent instructions, not context
+        the plugin ships. It points at AGENTS.md, which every agent reads.
+
+# → marketplace.json entry
+marketplace:
+  category: development
+  homepage: https://chris-peterson.github.io/mate/#/
+
+# → marketplace SPA; keys mirror the SPA's PLUGINS object.
+suite:
+  group: waypoints
+  # Both siblings are optional. mate composes with them and degrades without
+  # them: a bare install still runs both skills start to finish, and the nudge
+  # names a command the user may not have — which reads as a suggestion, which
+  # is all a nudge ever is.
+  dependencies:
+    - name: tack
+      required: false
+      reason: opens the envelope each skill starts from and closes it at the end
+    - name: anchor
+      required: false
+      reason: supplies the commit, change-request, merge, and release phases the nudge names
+  # Two user-invoked skills, plus hooks that read both shapes a skill
+  # invocation arrives in. Nothing at session start.
+  activations: [agent, user]
+  gloss: The first mate runs the ship day to day and says what's next. The captain still gives the orders.
+  pitch: "Know the next phase without a sequencer running it for you."
+  what: "Refine is where the code actually changes, and it has two shapes: a defect whose cause isn't known yet, and a capability that isn't there yet. /fix drives a bug from symptom to shipped fix — root cause, a test that fails for the reason the bug exists, then a sweep for the same bug class. /feature adds capability to a working codebase against the patterns already in it. Between them sits one line of forward pressure: on entering a phase, mate names the phase after it and stops. You type the next command, or you don't."
+  # >>> shipyard:describe — generated from source by `shipyard gen-describe`; do not edit >>>
+  describe:
+    skills:
+      feature: Add a capability to an existing codebase — gather the constraints that prevent false starts, implement one feature at a time against the repo's existing patterns, verify each against real feedback, then consolidate before merge.
+      fix: Diagnose a bug whose cause isn't known yet — root-cause it, prove it with a failing test, then sweep for the same bug class.
+    hooks:
+      hooks: 'Hook wiring: PostToolUse→nudge (Skill); UserPromptSubmit→nudge.'
+      nudge: PostToolUse / UserPromptSubmit — Names the phase that follows the one just entered, as one line the user acts on or ignores.
+  # <<< shipyard:describe <<<
+  examples:
+    - label: "Opening work on an issue"
+      ac: "--orient"
+      frames:
+        - { t: you, text: "/tack:start https://github.com/acme/api/issues/412" }
+        - { t: claude, text: "Route opened. The issue is labelled `bug` and the description has a stack trace with no known cause — that's a defect, so `/mate:fix` is the fit rather than `/mate:feature`." }
+        - { t: status, text: "mate classified it; the user types the command" }
+    - label: "Finishing a fix"
+      ac: "--green"
+      frames:
+        - { t: you, text: "/mate:fix the 500 on empty POST bodies" }
+        - { t: claude, text: "RED confirmed (3 tests fail against current code) → GREEN. Root cause: payload validation is skipped when Content-Length is 0. Swept four sibling handlers; one had the same gap. Next step when you're ready: `/anchor:commit`." }
+        - { t: status, text: "the next phase is named, not run" }
+  session:
+    - { t: you, text: "why is the nightly job red only on arm64" }
+    - { t: claude, text: "That's a defect with no known cause and no route open for this session." }
+    - { t: event, text: "mate names the skill: /mate:fix" }
+    - { t: cmd, cmd: "/mate:fix", out: "diagnosis → RED → GREEN → sweep · next: /anchor:commit" }
+    - { t: note, text: "Every line mate emits is a suggestion. Nothing here ran a phase on its own." }
+
+docs:
+  code_languages: [bash, json, yaml, markdown]
+  mermaid: true

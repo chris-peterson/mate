@@ -1,0 +1,7 @@
+- [Home](/)
+- Skills
+  - [fix](/skills/fix)
+  - [feature](/skills/feature)
+- [Hooks](/hooks)
+- Guides
+  - [Composing with the siblings](/guides/composing-with-siblings)

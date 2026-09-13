@@ -1,0 +1,20 @@
+{
+  "name": "mate",
+  "version": "0.1.0",
+  "description": "The two skills that make the change \u2014 /fix for a defect, /feature for a capability \u2014 plus a hook that names the phase you are about to enter next.",
+  "author": {
+    "name": "chris-peterson"
+  },
+  "repository": "https://github.com/chris-peterson/mate",
+  "license": "MIT",
+  "keywords": [
+    "fix",
+    "feature",
+    "debugging",
+    "tdd",
+    "refine",
+    "workflow",
+    "claude-code"
+  ],
+  "homepage": "https://chris-peterson.github.io/mate/#/"
+}

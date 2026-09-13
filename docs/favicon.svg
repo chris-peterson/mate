@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="mate">
+  <rect width="64" height="64" rx="14" fill="#282a36"/>
+  <!-- A first mate's sleeve: two rank stripes, the upper one ending in the
+       executive curl. The curl is drawn as an open loop so it still reads as a
+       loop at 16px, where a filled one closes up into a blob. The chevron to
+       the right of the stripes is the nudge — one mark pointing at what comes
+       next, and nothing after it. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 26 H36 C41.5 26 43 21 39 19.5 C35.5 18.2 33.5 22.5 36.5 24.2"
+          stroke="#f1fa8c" stroke-width="4.6"/>
+    <path d="M14 40 H36" stroke="#f1fa8c" stroke-width="4.6"/>
+    <path d="M46 27 L53 33 L46 39" stroke="#8be9fd" stroke-width="4.6"/>
+  </g>
+</svg>
