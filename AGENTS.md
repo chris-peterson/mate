@@ -21,8 +21,9 @@ just docs              # preview the docsify site locally
 
 ```text
 plugin.yml              source of record for metadata and marketplace copy
-hooks/hooks.yml         source of record for the two hook registrations
+hooks/hooks.yml         source of record for the three hook registrations
 hooks/nudge.sh          the nudge — resolves a skill name from both shapes
+hooks/react.sh          the reaction — reads one key off a sibling's stdout
 skills/fix/             the defect skill and its reference files
 skills/feature/         the capability skill and its reference files
 guides/                 the composition contract with tack, anchor, code-review
@@ -62,11 +63,26 @@ what picks the level.
   same script, and `scripts/tests/nudge.test.sh` exercises both.
 - **A synthetic payload proves the matcher, never the delivery.** The test suite
   is green on a hook Claude Code never calls. A change to the registrations or
-  to the name resolution is finished when the command has been typed in a live
-  session and the line came back.
-- **`hooks/nudge.sh` is bash and jq, nothing else.** It runs on every prompt in
-  every session where mate is enabled, so the non-matching path is a pattern
-  test and an `exit 0`. No network, no interpreter startup.
+  to the name resolution is finished when the line has come back in a live
+  session. A headless run is the cheap way to get one:
+
+  ```bash
+  claude -p --plugin-dir . --settings <capture.json> --permission-prompts none \
+    '/tack:start https://github.com/o/r/issues/1'
+  ```
+
+  Point `capture.json` at a hook of your own that appends its stdin to a file,
+  and the captured payload is the real one — which is how the shape a hook reads
+  gets settled rather than assumed. `grep` the run's `transcript_path` for the
+  line to confirm the agent received it, not merely that the script ran.
+- **Both hooks are bash and jq, nothing else.** They run on every prompt and
+  every Bash call in every session where mate is enabled, so the non-matching
+  path is a pattern test and an `exit 0`. No network, no interpreter startup.
+- **A key another plugin already answers is a key mate leaves alone.** What
+  `react.sh` subscribes to is settled by what nobody else says: the nudge
+  already names the phase for every anchor event emitted by a skill it matches,
+  and tack records the CR, issue and release keys on the route. Before adding a
+  key, read `plugin.yml`'s `events` block for why the others are absent.
 - **Stdout is context, not a log.** Anything the hook prints lands in the
   agent's context whether or not it is useful there. Every non-matching path
   prints nothing.

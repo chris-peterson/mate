@@ -16,9 +16,14 @@
   `references/verification.md` and `references/patterns.md`.
 - The nudge hook — on entering a phase, one line naming the phase after it,
   through `/anchor:commit`, `/code-review`, `/anchor:prepare-review`,
-  `/anchor:merge`, `/anchor:release`, and `/tack:end`. On `/tack:start` it
-  instead classifies the linked issue as a defect or a capability and names the
-  skill that fits. It registers on both shapes a skill invocation arrives in,
-  so a command the user types reaches it as well as one the agent invokes.
+  `/anchor:review`, `/anchor:merge`, `/anchor:release`, and `/tack:end`. On
+  `/tack:start` it instead classifies the linked issue as a defect or a
+  capability and names the skill that fits. It registers on both shapes a skill
+  invocation arrives in, so a command the user types reaches it as well as one
+  the agent invokes.
+- The react hook — subscribes to `codes.bridgeai.anchor/cr.ready`, the suite
+  announcement that a change request left draft, and names what it still needs:
+  a reviewer to assign or hand the URL to, and the pipeline's state. The URL
+  comes from the announcement, which is what a command name can never carry.
 - `guides/composing-with-siblings.md` — which sibling supplies which phase, and
   what replaces each one when it isn't installed.

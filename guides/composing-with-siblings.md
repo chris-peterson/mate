@@ -13,12 +13,15 @@ This is the map of who supplies what, and what to do when they aren't there.
 | Commit and push | `/anchor:commit` | [anchor](https://github.com/chris-peterson/anchor) |
 | Review the branch | `/code-review` | Claude Code |
 | Open the change request | `/anchor:prepare-review` | anchor |
+| Self-review it | `/anchor:review` | anchor |
 | Merge | `/anchor:merge` | anchor |
 | Release | `/anchor:release` | anchor |
 | Close the envelope | `/tack:end` | tack |
 
-mate's hook names the next link in that chain as one line, once, on entering a
-phase. It never runs one.
+mate's hooks name the next link in that chain as one line, once. `nudge.sh`
+names it on entering a phase; `react.sh` names what the change request still
+needs when anchor reports the draft flag came off, which is the one moment the
+URL to hand over exists. Neither runs anything.
 
 ## What absence costs, and what replaces it
 

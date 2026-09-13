@@ -59,8 +59,8 @@ mate: when this phase is done and the tree is green, the next step is
 ## The chain it names
 
 `/tack:start` → **`/mate:fix`** or **`/mate:feature`** → `/anchor:commit` →
-`/code-review` → `/anchor:prepare-review` → `/anchor:merge` →
-`/anchor:release` → `/tack:end`
+`/code-review` → `/anchor:prepare-review` → `/anchor:review` →
+`/anchor:merge` → `/anchor:release` → `/tack:end`
 
 mate supplies the two in bold. [tack](https://github.com/chris-peterson/tack)
 and [anchor](https://github.com/chris-peterson/anchor) supply the rest, and both
@@ -74,6 +74,18 @@ A slash command *you* type is expanded into the prompt and fires no `Skill` tool
 call; only an agent-invoked skill produces one. mate registers on both events
 against the same script, so the line arrives whichever way the phase was
 entered.
+
+One line arrives by a different road. The suite's plugins announce what they
+caused on a command's stdout — `codes.bridgeai.anchor/cr.ready` when the draft
+flag comes off a change request — and mate subscribes to that one key. It is the
+first moment the change request is something to hand to somebody, and the
+announcement carries the URL to hand over, which a command name never does. So
+the line asks for the two things a CR out of draft still needs, a reviewer and
+the pipeline's state, and then names `/anchor:merge`.
+
+Everything else anchor announces already lands on a phase the nudge names, and
+[tack](https://github.com/chris-peterson/tack) records the CR, issue and release
+keys on the route — so mate says nothing about them rather than saying it twice.
 
 ## Why "mate"
 

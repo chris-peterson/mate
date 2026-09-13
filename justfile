@@ -36,3 +36,11 @@ describe:
 # feed the nudge hook one payload and print what it says back
 nudge PAYLOAD:
     @printf '%s' '{{PAYLOAD}}' | bash hooks/nudge.sh
+
+# feed the react hook one anchor announcement and print what it says back
+react ANNOUNCEMENT:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    jq -nc --arg o '{{ANNOUNCEMENT}}' --arg s "just-$$" \
+      '{session_id:$s,tool_name:"Bash",tool_response:{stdout:$o}}' \
+      | bash hooks/react.sh

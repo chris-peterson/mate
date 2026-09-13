@@ -23,6 +23,20 @@ marketplace:
   category: development
   homepage: https://chris-peterson.github.io/mate/#/
 
+# mate publishes nothing: it causes no artifact a sibling could act on. What it
+# hears is one key. anchor's other events each arrive at a phase the nudge
+# already names from the skill that emits them, and tack records cr.created,
+# cr.updated, cr.merged, issue.created and release.created on the route — a
+# second line about either would be noise, not forward pressure.
+events:
+  subscribes:
+    - key: codes.bridgeai.anchor/cr.ready
+      handled_by: hooks/react.sh
+      reason: >-
+        the draft flag coming off is the first moment the change request is
+        something to hand to somebody, and the announcement carries the URL to
+        hand over — which the skill-name match never has
+
 # → marketplace SPA; keys mirror the SPA's PLUGINS object.
 suite:
   group: waypoints
@@ -49,8 +63,9 @@ suite:
       feature: Add a capability to an existing codebase — gather the constraints that prevent false starts, implement one feature at a time against the repo's existing patterns, verify each against real feedback, then consolidate before merge.
       fix: Diagnose a bug whose cause isn't known yet — root-cause it, prove it with a failing test, then sweep for the same bug class.
     hooks:
-      hooks: 'Hook wiring: PostToolUse→nudge (Skill); UserPromptSubmit→nudge.'
+      hooks: 'Hook wiring: PostToolUse→nudge (Skill), react (Bash); UserPromptSubmit→nudge.'
       nudge: PostToolUse / UserPromptSubmit — Names the phase that follows the one just entered, as one line the user acts on or ignores.
+      react: PostToolUse — Names what a change request still needs once anchor reports the draft flag came off.
   # <<< shipyard:describe <<<
   examples:
     - label: "Opening work on an issue"

@@ -79,8 +79,15 @@ MSG
     ;;
   anchor:prepare-review)
     cat <<'MSG'
-mate: with the change request described and out for review, the next step is
-`/anchor:merge`. Name it in the wrap-up; don't run it.
+mate: the change request opens as a draft, so the next step is `/anchor:review`
+over your own change — the fixes land in the tree, nothing posts, and it ends by
+offering to take the draft flag off. Name it in the wrap-up; don't run it.
+MSG
+    ;;
+  anchor:review)
+    cat <<'MSG'
+mate: once the change request is out of draft and someone is looking at it, the
+next step is `/anchor:merge`. Name it in the wrap-up; don't run it.
 MSG
     ;;
   anchor:merge)
