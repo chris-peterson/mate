@@ -65,3 +65,17 @@ When a bug ships alongside a green suite, suspect a test that **supplies the ver
 **Fix it** by pointing the test at the real contract. A unit test that set `CLAUDE_SESSION_ID` and asserted the pin captured it stayed green while the code read a variable the harness never populates; asserting the real harness variable is what makes the suite defend the contract instead of the code's mistake about it.
 
 A test that asserts its own premise is claiming verification without verifying. Suspect it for any bug that coexists with passing tests over environment variables, config keys, feature flags, or API field names.
+
+## Prove the check can fail
+
+A check reporting green across every input is equally consistent with a population that complies and with a check that cannot report anything else.
+
+**Name the input that would make it fail, then feed it that input and watch it fail.** If you can't name one, it isn't a check yet. Ship the failing fixture alongside the check, or the first real violation is also the first run of the branch that handles it.
+
+Three ways a green result carries no information:
+
+- **Blind by construction.** Ask which components the check exercises and whether the suspect is among them before treating a pass as a discriminator. A `--dry-run` that passed twice proved nothing about a failure caused by the repo's own `pre-commit` hook, because dry runs don't execute hooks.
+- **A checker that shares its repair's blind spot certifies nothing.** If the audit and the fix model the file the same way, the audit confirms the fix ran and says nothing about whether it was right.
+- **A negative search result is a claim about your query as much as the data.** A grep for a JSON key written with a space after the colon could never match — the writer emits no space — so its empty result carried nothing. Show the positive form exists in the data before reading an absence as a finding.
+
+**Verify fixture attribution by perturbation, not by re-reading.** Rebuild the failing case, fix *only* the intended violation, and confirm the check flips to pass. A fixture that differs from its compliant twin in two ways can return `fail` for the wrong reason, and that failure looks exactly like a negative proof.

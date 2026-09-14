@@ -59,11 +59,12 @@ Never wrap the requested approach in a fallback that degrades to a simpler path;
 
 ## Phase 3 — Refine against real feedback (30 min to hours)
 
-Pick the feedback loop that can actually catch this feature's failures — unit tests, a live run, the real protocol, a full CI/deploy cycle, or inspecting the emitted artifact. `references/verification.md` maps feature shapes to instruments and covers both-branch verification for convergent changes and visual verification for anything with a rendered surface.
+Pick the feedback loop that can actually catch this feature's failures — unit tests, a live run, the real protocol, a full CI/deploy cycle, or inspecting the emitted artifact. `references/verification.md` maps feature shapes to instruments, covers both-branch verification for convergent changes and visual verification for anything with a rendered surface, and says how to construct the degraded input instead of reasoning about it.
 
 - **Expect most iteration to be polish, not function.** Functional correctness typically arrives around iteration 5-6; console output, error messages, progress indicators, and docs take many more. Budget for it, and agree with the user on what "good enough" means before starting — polish iterations otherwise continue indefinitely.
 - **Treat each real-world issue as immediate input.** Runtime errors, unexpected metadata, layout instability: act on each as it surfaces rather than batching. Observing actual output beats specifying UX up front.
 - **Treat manual testing as discovery, not just verification.** It routinely surfaces bugs and gaps automated tests miss, which is why a one-feature session often ships three features plus fixes.
+- **Where the feature ships a pattern others are meant to copy, use it in the project's own code first.** Using it is what finds the bug, while nobody has copied it yet; `references/verification.md` has the defect that ordering caught.
 - **When a test for the new feature fails, fix the code.** The test is a fixed acceptance target; a shrinking assertion or a loosened threshold ships the feature unverified behind a green suite.
 - **Reset to zero when the session balloons.** When failed approaches and scope expansion make the branch hard to reason about, stash to a side branch and re-derive the minimum viable change from baseline. That's cheaper than pruning an overgrown branch.
 
@@ -92,6 +93,8 @@ Local build success does not predict deployment success. Constraints that only s
 
 Long sessions accumulate context faster than they look like they do, and idle gaps — waiting on CI, reviewing, interruptions — burn it without adding anything. When the session approaches that threshold, say so and propose splitting the work or persisting the decisions to CLAUDE.md before continuing.
 
+**Make the result observable before reporting it.** Give the user a command they can paste and the output it actually produced, rather than a prose summary. Name what the session leaves behind, too: a background server, a scratch directory, a file written outside the tree.
+
 Where tack is installed, the close is **`/tack:end`** — it reads what actually landed (a draft CR with green checks is a stall, not a finish), records the deliverable against the route, decides whether the session earned a retro, and reports the commands still owed rather than running them. Where it isn't, close by hand: a draft CR with green checks is still a stall, so say what landed, what is still owed, and whether the session earned a retro.
 
 ## Working style: the user directs, you implement
@@ -100,7 +103,7 @@ Backseat driving is the interaction style this work rewards — the user stays i
 
 ## Reference files
 
-- **`references/verification.md`** — which feedback loop catches which failure, both-branch verification for idempotent/convergent changes, visual verification, and validating artifacts rather than logs.
+- **`references/verification.md`** — which feedback loop catches which failure, both-branch verification for idempotent/convergent changes, visual verification, validating artifacts rather than logs, constructing the degraded input, and using a pattern before documenting it.
 - **`references/patterns.md`** — the accumulated what-works / what-doesn't catalog from past feature sessions: design sign-off shapes, command-topology decisions, scope control, and the failure modes that recur.
 
 ## Related
