@@ -44,10 +44,9 @@ and only that half.
 | Who runs the next step | the skill | you, by typing it |
 | Fix vs feature | you pick | mate classifies from the issue |
 
-The classification is the agent's call rather than a question put to you: `fix`
-opens with the rule that decides it — skip this skill when the work is a feature
-or a refactor rather than a defect — and the hook applies that sentence to the
-linked issue's labels and description.
+The classification is the agent's call rather than a question put to you: on
+`/tack:start` the nudge names both skills and asks the agent to read the issue's
+labels and description and say in one line which one fits.
 
 Everything else is a suggestion:
 
@@ -80,8 +79,9 @@ caused on a command's stdout — `codes.bridgeai.anchor/cr.ready` when the draft
 flag comes off a change request — and mate subscribes to that one key. It is the
 first moment the change request is something to hand to somebody, and the
 announcement carries the URL to hand over, which a command name never does. So
-the line asks for the two things a CR out of draft still needs, a reviewer and
-the pipeline's state, and then names `/anchor:merge`.
+the line asks for the two things a CR out of draft still needs: a reviewer and
+the pipeline's state. Naming `/anchor:merge` is already the `/anchor:review`
+nudge's job, so the reaction leaves it alone.
 
 Everything else anchor announces already lands on a phase the nudge names, and
 [tack](https://github.com/chris-peterson/tack) records the CR, issue and release

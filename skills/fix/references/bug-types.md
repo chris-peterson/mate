@@ -49,6 +49,12 @@ Two repos are relevant:
 - The shared library (aspnetcore) — where the toolbar code lives
 ```
 
+### When no live branch carries the call site
+
+Stop before drafting the fix again and ask what the reachable branch *can* carry. In a project that releases from a private repo, the public `release/*` branches are pushes for the drop and get deleted afterwards, so an affected line can have no branch at all — check whether a branch holds commits beyond its released tag, because one that is *exactly* the tag has nothing on it.
+
+The durable artifact is then usually a **test on the default branch**: one that passes today and fails the moment the defect is ported forward. It needs no product change, targets a branch that exists, and is a shape maintainers merge. Post the finished patch itself on the issue thread, one labelled diff per affected line, each stating its base and whether it was actually built.
+
 ## Infrastructure / configuration history
 
 **Symptom:** the question is "when did this stop working, and why?" rather than a stack trace — a stale-looking config reference, a service behaving unexpectedly, no certainty it ever worked in this environment.

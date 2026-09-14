@@ -1,6 +1,5 @@
 ---
 name: feature
-disable-model-invocation: true
 description: Add a capability to an existing codebase — gather the constraints that prevent false starts, implement one feature at a time against the repo's existing patterns, verify each against real feedback, then consolidate before merge.
 argument-hint: "[what to build]"
 ---
@@ -95,19 +94,13 @@ Long sessions accumulate context faster than they look like they do, and idle ga
 
 **Make the result observable before reporting it.** Give the user a command they can paste and the output it actually produced, rather than a prose summary. Name what the session leaves behind, too: a background server, a scratch directory, a file written outside the tree.
 
-Where tack is installed, the close is **`/tack:end`** — it reads what actually landed (a draft CR with green checks is a stall, not a finish), records the deliverable against the route, decides whether the session earned a retro, and reports the commands still owed rather than running them. Where it isn't, close by hand: a draft CR with green checks is still a stall, so say what landed, what is still owed, and whether the session earned a retro.
-
-## Working style: the user directs, you implement
-
-Backseat driving is the interaction style this work rewards — the user stays in architect mode and writes prompts instead of code, and vague prompts produce vague output while specific ones produce specific output. It fits integration work, boilerplate-heavy tasks, tedious-syntax formats (MSBuild XML, zsh completion, regex, YAML, CI config), and settled architectures. It fits badly when the user is still exploring what the solution should be, or when the code is simple enough that typing it is faster than describing it.
+A draft CR with green checks is a stall, not a finish. Where tack is installed, the close is **`/tack:end`** — it reads what actually landed, records the deliverable against the route, decides whether the session earned a retro, and reports the commands still owed rather than running them. Where it isn't, close by hand: say what landed, what is still owed, and whether the session earned a retro.
 
 ## Reference files
 
 - **`references/verification.md`** — which feedback loop catches which failure, both-branch verification for idempotent/convergent changes, visual verification, validating artifacts rather than logs, constructing the degraded input, and using a pattern before documenting it.
-- **`references/patterns.md`** — the accumulated what-works / what-doesn't catalog from past feature sessions: design sign-off shapes, command-topology decisions, scope control, and the failure modes that recur.
+- **`references/patterns.md`** — the accumulated what-works / what-doesn't catalog from past feature sessions: where backseat driving fits and where it doesn't, design sign-off shapes, command-topology decisions, scope control, and the failure modes that recur.
 
 ## Related
-
-Phase 4's scan turns on a changeset's own divergence the habit of fixing what you find everywhere it fits. Claims about *why* a chosen approach is correct — a precedence order, a rendering behavior, a variable's availability — need a probe rather than a recollection; the cheapest decisive probe usually beats reading source.
 
 The [feature-dev plugin](https://claude.com/plugins/feature-dev) covers the same ground as a guided seven-phase workflow with dedicated exploration, architecture, and review agents. Reach for it when the preference is step-by-step interactive structure over this skill's phases.

@@ -9,7 +9,8 @@ fork rather than describing a phase.
 ### Backseat driving
 
 The user directs; the agent implements every line. The user stays in architect
-mode and spends their effort on prompt text instead of code.
+mode and spends their effort on prompt text instead of code, so vague prompts
+produce vague output and specific ones produce specific output.
 
 **Works for:** integration work (CI/CD, multi-file coordination); boilerplate-
 heavy tasks (scripts, config, docs); unfamiliar territory where the agent has

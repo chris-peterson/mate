@@ -44,6 +44,7 @@ When layers are chained — CI, Docker, SDK, framework, application code — tes
 - For API bugs, bypass the app and call the endpoint with `curl`. Working `curl` puts the bug in request construction; failing `curl` puts it in the API or the credentials.
 - For container bugs, mount the repo into the container and run the exact CI command.
 - **For binary distribution channels, test each channel separately.** The same upstream version obtained different ways can differ: file capabilities survive `COPY --from=<image>` but not a zip download. One case isolated exactly this — `COPY --from=hashicorp/vault` propagated `setcap cap_ipc_lock=+ep` while the releases-server zip did not.
+- **For a client-side mechanism, stand up the client.** A beacon CSRF fix took five Playwright calls: load a hostile page, confirm the frame really is the opaque-origin case (`window.origin === "null"`), see its fetch fail, then load the bundled dashboard on loopback and see it still poll. `curl` returning `403` would have proved only that the server refuses.
 
 The more layers between the observer and the failure, the more this pays.
 

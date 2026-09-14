@@ -10,12 +10,11 @@
 # The grammar and the publishing rules are the suite's interop contract:
 # https://github.com/chris-peterson/claude-marketplace/blob/main/authoring/plugin-contract.md
 #
-# Only `cr.ready` is read. Of everything anchor publishes it is the one key
-# neither of the other two paths reaches: nudge.sh already names the phase after
-# the skill that emits the rest, and tack records cr.created, cr.updated,
-# cr.merged, issue.created and release.created on the route. cr.ready is also
-# the first moment the CR is a thing to hand to somebody — a draft has a URL but
-# nobody to send it to.
+# Only `cr.ready` is read, and only for what a skill-name match cannot supply:
+# the CR's URL, and the moment it becomes a thing to hand to somebody. Naming
+# the phase after this one is nudge.sh's `anchor:review` case, so this line
+# stops at the handoff. tack records cr.created, cr.updated, cr.merged,
+# issue.created and release.created on the route.
 #
 # Matching what anchor says rather than the shape of the command it ran is what
 # lets anchor change forge CLIs without silently taking this line out.
@@ -40,23 +39,27 @@ line=$(printf '%s' "$output" \
   | head -n 1 || true)
 [ -n "$line" ] || exit 0
 
-uri=$(printf '%s' "${line#* }" | jq -r '.uri // empty' 2>/dev/null || true)
+# The separator is whatever whitespace the publisher used; a tab is as valid as
+# a space and drops the URL if the key is stripped on spaces alone.
+body=$(printf '%s' "$line" | sed 's|^[^[:space:]]*[[:space:]]*||')
+uri=$(printf '%s' "$body" | jq -r '.uri // empty' 2>/dev/null || true)
 target=${uri:-the change request}
 
-# Once per session: a CR marked ready twice is still one handoff.
+# Once per session: a CR marked ready twice is still one handoff. These markers
+# are the only thing mate leaves outside the agent's context, so they expire.
 marker_dir="${TMPDIR:-/tmp}/mate-cr-ready"
 mkdir -p "$marker_dir"
-marker="${marker_dir}/${session_id}"
+find "$marker_dir" -type f -mtime +7 -delete 2>/dev/null || true
+marker="${marker_dir}/${session_id//[^A-Za-z0-9._-]/_}"
 [ -f "$marker" ] && exit 0
 touch "$marker"
 
 cat <<MSG
-mate: ${target} is out of draft, so it is ready for eyes that aren't yours.
-Before naming the next phase, say in one line what it still needs:
+mate: ${target} is out of draft, so it is ready for eyes that aren't yours. Say
+in one line what it still needs:
 
   a reviewer     assign one, or hand the URL to whoever should look
   the pipeline   report where it stands rather than waiting to be asked
 
-After that the next phase is \`/anchor:merge\`. Name it in the wrap-up; don't
-run it.
+Say it in the wrap-up; don't act on it.
 MSG

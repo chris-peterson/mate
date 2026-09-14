@@ -51,7 +51,15 @@ stdout_case() {
   check "$1" "$2" "$(announced "$3" "sess-$SESSION_SEQ")"
 }
 
+# Passes when the needle is absent: the grep output is the result, so "silent"
+# means the line never said it.
+stdout_absent_case() {
+  SESSION_SEQ=$((SESSION_SEQ + 1))
+  check "$1" silent "$(announced "$3" "sess-$SESSION_SEQ" | grep -F -- "$2" || true)"
+}
+
 READY='codes.bridgeai.anchor/cr.ready {"uri":"https://github.com/o/r/pull/88"}'
+READY_TAB=$(printf 'codes.bridgeai.anchor/cr.ready\t{"uri":"https://github.com/o/r/pull/88"}')
 
 echo "=== react tests ==="
 
@@ -60,14 +68,18 @@ echo "Names what the change request still needs:"
 stdout_case "carries the CR url"       "https://github.com/o/r/pull/88" "$READY"
 stdout_case "asks for a reviewer"      "a reviewer"                     "$READY"
 stdout_case "asks for the pipeline"    "the pipeline"                   "$READY"
-stdout_case "names the next phase"     "/anchor:merge"                  "$READY"
+stdout_case "a tab still carries it"   "https://github.com/o/r/pull/88" "$READY_TAB"
 stdout_case "empty body still speaks"  "the change request"             'codes.bridgeai.anchor/cr.ready {}'
 stdout_case "announcement among output" "https://github.com/o/r/pull/88" \
   "$(printf 'PUSHED=ok\n%s\n' "$READY")"
 
 echo ""
-echo "Never sequences — the line says not to run the next step:"
+echo "Never sequences — the line says not to act on what it names:"
 stdout_case "hands-off"                "don't" "$READY"
+
+echo ""
+echo "Leaves the merge nudge to nudge.sh's anchor:review case:"
+stdout_absent_case "no second merge line" "/anchor:merge" "$READY"
 
 echo ""
 echo "Silent on everything else:"
@@ -83,7 +95,7 @@ stdout_case "empty stdout"             silent ''
 payload=$(jq -nc --arg o "$READY" '{session_id:"sess-repeat",tool_name:"Bash",tool_response:{stdout:$o}}')
 first=$(printf '%s' "$payload" | TMPDIR="$TMPROOT" bash "$HOOK" 2>/dev/null || true)
 second=$(printf '%s' "$payload" | TMPDIR="$TMPROOT" bash "$HOOK" 2>/dev/null || true)
-check "first ready speaks" "/anchor:merge" "$first"
+check "first ready speaks" "ready for eyes that aren't yours" "$first"
 check "second ready is silent" silent "$second"
 
 # A payload with no session id can't be guarded, so it says nothing rather than

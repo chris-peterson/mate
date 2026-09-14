@@ -20,18 +20,20 @@ set -euo pipefail
 
 input=$(cat)
 
-skill=$(printf '%s' "$input" | jq -r '.tool_input.skill // empty' 2>/dev/null || true)
-
-prompt=""
-if [ -z "$skill" ]; then
-  prompt=$(printf '%s' "$input" | jq -r '.prompt // empty' 2>/dev/null || true)
-  # Anchored at the start of the first line, so a prompt that mentions a command
-  # mid-sentence doesn't match; the character class is greedy, so `/fixture`
-  # resolves to `fixture` rather than matching a `fix` prefix.
-  skill=$(printf '%s' "$prompt" \
-    | head -n 1 \
-    | sed -n 's|^[[:space:]]*/\([A-Za-z0-9:_-][A-Za-z0-9:_-]*\).*|\1|p')
-fi
+# One jq pass, with nothing piped downstream of it: a `head -n 1` reading a
+# pasted stack trace closes the pipe early, and under `pipefail` the SIGPIPE
+# that follows takes the hook down before it reaches the case.
+#
+# The typed form is anchored at the start of the first line, so a prompt that
+# mentions a command mid-sentence doesn't match; the character class is greedy,
+# so `/fixture` resolves to `fixture` rather than matching a `fix` prefix.
+skill=$(printf '%s' "$input" | jq -r '
+  (.tool_input.skill // "") as $s
+  | if $s != "" then $s
+    else ((.prompt // "")
+          | split("\n")[0]
+          | [scan("^[[:space:]]*/([A-Za-z0-9:_-]+)")] | .[0][0] // "")
+    end' 2>/dev/null || true)
 
 [ -n "$skill" ] || exit 0
 
@@ -43,7 +45,7 @@ fi
 # them is namespaced in every install that has it.
 case "$skill" in
   tack:start)
-    url=$(printf '%s' "$prompt" | sed -n 's|.*\(https://[^ )]*\).*|\1|p' | head -n 1)
+    url=$(printf '%s' "$input" | jq -r '(.prompt // "") | [scan("https://[^ )\n]+")] | .[0] // ""' 2>/dev/null || true)
     target=${url:-the linked issue}
     cat <<MSG
 mate: this session is opening work on ${target}. Classify it yourself — read the
