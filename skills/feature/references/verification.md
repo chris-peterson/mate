@@ -125,3 +125,38 @@ proved the drift guard.
 Before claiming a failure predates the change, `git stash -u`, re-run exactly
 those tests against the unmodified base, and compare. An identical reproduction
 is what earns the "not mine" claim; a test name that looks unrelated is not.
+
+## Construct the degraded input rather than reasoning about it
+
+The happy path is the one in front of you, so a claim about what happens when
+the input is *wrong* gets asserted from the API's shape instead of exercised —
+and that claim is usually the reason no guard was written. Build the broken case
+and run it. Three shapes the result takes, each with a claim that came back
+that way:
+
+- **Backwards.** `&&` chaining looked fine for running build-then-push under a
+  role-assuming wrapper. The `&&` binds in the *caller's* shell, so only the
+  first command gets the role, silently.
+- **True only under a condition nobody stated.** A heredoc does work through a
+  YAML block scalar — at one indentation. Mis-indent it and the shell eats the
+  rest of the job, runs a stray command, and exits 0.
+- **Confirmed.** `exec "$@"` is injection-safe; metacharacters, `$( )` and pipes
+  all arrive as literal argv. Running it is what makes that a fact rather than
+  a belief.
+
+A form whose most natural mis-use fails at exit 0 doesn't belong in a README,
+and constructing the degraded input is what tells you which forms those are.
+"When the consumer ships a validator" above carries two worked instances:
+planting bad input in a real entry, and falsifying a guard whose input set is
+still empty.
+
+## Use the pattern before documenting it
+
+Where a feature ships a pattern other people are meant to copy, use it in the
+project's own code before the README describes it.
+
+One wrapper carried its own open/close pattern in its body before the README
+covered it, which surfaced a defect: a per-region auth call had become a *child*
+process, so the credentials it set up died with the child, and every command
+after it ran on whatever the parent already had. It had been that way for two
+releases.

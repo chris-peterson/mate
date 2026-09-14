@@ -28,7 +28,7 @@ Work in the target repo's own working directory. Cross-cwd debugging multiplies 
 
 ## Phase 1 — Establish the bug is real and current (5-10 min)
 
-Three cheap gates, before any diagnosis. Each one can end the session outright.
+Cheap gates, before any diagnosis. Each one can end the session outright.
 
 1. **Confirm the defect still exists on the latest default branch.** `git fetch` and reproduce there, not in whatever is checked out. Do this per repo when suspect code spans repos — staleness is per-repo. A non-fast-forward rejection at push time is the late warning: read `HEAD..origin/<branch>` before forcing through.
    - **Where servicing branches exist, survey every live line and released tag for the call site before choosing a target branch, and treat the issue's stated versions as a hypothesis.** The reporter saw one version; anything backported is affected on lines they never ran. `git log -S "<expression>"` against each ref answers it in one pass, and the answer moves in both directions: it can add a servicing line the issue never mentioned, and it can rule the default branch out entirely — code that lacks the parameter your fix guards has nothing to fix and can't take the PR. Put both findings in the change-request description; the maintainer shouldn't have to re-derive them.
@@ -48,8 +48,10 @@ Reason about candidate mechanisms *before* reading files. A precise symptom — 
 - **When the failing code hasn't changed, the environment is the suspect — diff around the code, not the code.** "Unchanged for weeks" is a signal, not a dead end. Check whether the image or dependency reference is pinned; if it floats, find the version running now versus what last passed and read that delta's release notes. An unpinned reference is a latent-bug detonator: the defect was dormant until the new version published. Pin it as part of the fix.
 - **Build the causal chain** from trigger to symptom, each link verifiable by a log line, stack frame, syscall, or config value. Present it — the user spots a wrong link faster than it can be verified.
 - **Treat a user correction as the highest-signal input.** Abandon the current hypothesis and restate the updated one in a sentence; don't reconcile the old path with the new information.
+- **Read every state you reason from off the thing itself, not off the process meant to change it.** "This host runs the old build", "that job never ran", "the flag is still set" — a pipeline job state, a merge status, or a config default describes *intent*; the running system describes what is. Classifying a node from a deploy job showing `manual` cost three rounds of mechanism reasoning, when the node had been built from the other branch the day before and the branch's own description said so. Each mechanism derived after a wrong premise still looks independently reasonable.
 - **Probe the live system when the mechanism turns on runtime behavior the source doesn't settle.** Competing theories all sound plausible; one read of the running system's actual state ends the debate. Reach for the probe before the third hypothesis, not after.
 - **When the system under test also gates your tools, the probe is subject to it.** Debugging a hook, a linter, a permission layer, or a sandbox means your probe command runs through the live copy of the thing you're probing — so its refusal arrives in the same channel as the probe's result, and reads as one. Check the *shape* of the output before its content: a plain-text message where the component emits JSON, an error where it exits silently. A probe of a safety hook came back with what looked like a decision and was actually the installed hook denying the probe's own command line, twice, because the payload contained the string being tested. Reshape the probe (write the input to a file, run it via a script) rather than reading the refusal as data.
+- **A hedge covers the sentence it sits in and nothing downstream.** Marking a mechanism "my read" or "inference rather than instrumented" and then recommending an edit on top of it still acts on an unverified claim. Either run the probe that would settle the premise, or state the recommendation as blocked on it.
 - **Test at system boundaries** to isolate the broken layer. If `dotnet msbuild` fails but `dotnet exec MSBuild.dll` works, the bug is in argument forwarding. If `curl` works but the app fails, the bug is in request construction.
 - **Find the regression commit, timeboxed to 15 minutes.** When the symptom names an exact string, `git log -S "<expression>" --all` beats bisect outright. If it doesn't converge, note that and move on — the test harness matters more than a perfect origin story.
 
@@ -79,7 +81,8 @@ Verify each iteration in the environment that actually fails. For CI-only bugs, 
 2. **Verify the surface for any render-contract bug.** Tests verify code; only a person or a screenshot verifies surface. Badge formats, profile JSON, CSS variables, status-bar layouts and dashboard widgets ship broken with a fully green suite. Plan the surface check into the timeline.
 3. **When the mechanism lives in a client, reproduce the delivery shape — the server-side assertion is a proxy.** A bug whose cause is browser, runtime, or driver behavior is only half-verified by the thing it talks to: `curl` returning `403` proves the server refuses, not that the attack the reporter demonstrated now fails. Stand up the actual shape — the sandboxed iframe, the mobile client, the old SDK version — and watch it fail, then watch the legitimate caller still succeed. In a beacon CSRF fix this was five Playwright calls: load a hostile page, confirm the frame really is the opaque-origin case (`window.origin === "null"`), see its fetch fail, then load the bundled dashboard on loopback and see it still poll. Reasoning from the spec instead is right most of the time and silently wrong the once it matters.
 4. **Sweep for the same bug class before shipping.** Identify the root antipattern rather than the symptom, then grep every file with similar logic — **including config, template, and render-contract files (`.json`, `.yaml`, `.toml`, `.template`)**, since those often carry the canonical value the code-side constant only backs up. **Sweep before grading severity**: the same wrong value can be dormant on one call path and a live bug on another, so impact assigned from the first site is provisional. **Validate the site list against raw source** before editing N files — a grep or parser summary is a hypothesis, and a parser that misreads nesting invents phantom sites. Decide each site explicitly: fix now, file a follow-up, or document why it's safe.
-5. **Review the diff** for side effects and strip debug scaffolding.
+5. **When the fix *is* a check — a guard, a lint, a gate, an assertion — confirm Phase 3's simulate-and-restore actually ran.** A green run on its own is equally consistent with a compliant population and with a check that cannot report anything else. `references/techniques.md` has the ways a green result carries no information, and the bad-input fixture to ship alongside the check.
+6. **Review the diff** for side effects and strip debug scaffolding.
 
 ## Phase 5 — Communicate (5 min)
 
@@ -92,6 +95,8 @@ Lead the commit message and change-request description with the **root cause**, 
 **Name the discipline actually run.** Reverting the fix and watching tests fail proves they're load-bearing; it does not make the work tests-first. Say "verified red/green (fix and tests written together, then reverted and confirmed)" when that's what happened.
 
 Cross-reference the originating deliverable when the bug surfaced during other work, so reviewers see the calling context.
+
+**Run the reproduction one last time and paste the command with what it printed**, so the reader can re-run it without asking what it was.
 
 **Report the machine state the session leaves behind, separately from the diff.** A toolchain installed side-by-side, a package feed added to unblock a restore, a container left running: any of these can be required to build and still belong nowhere near the commit. Reverting the local workaround is right, and it restores the failure for the next session — so a clean tree is not the same as an unchanged machine. Name what was installed and what was reverted at the close.
 
@@ -108,7 +113,7 @@ Past ~90 minutes with no resolution, surface that and propose a reset with refin
 ## Reference files
 
 - **`references/bug-types.md`** — the symptom catalog: framework/SDK upgrades, environment-specific, cross-repo, infrastructure/config history, alerts that never fired, safety gates that fail open, intermittent/flaky. Each with the context to gather and a worked prompt.
-- **`references/techniques.md`** — regression bisect and source-string search, verification-as-diagnosis, boundary testing, timing probes, and the self-validating test.
+- **`references/techniques.md`** — regression bisect and source-string search, verification-as-diagnosis, boundary testing, timing probes, the self-validating test, and proving a check can fail.
 
 ## Related
 
