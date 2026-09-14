@@ -67,8 +67,15 @@ prompt_case "bare code-review"            "/anchor:prepare-review" "/code-review
 prompt_case "leading whitespace"          "/anchor:commit"         "  /mate:fix"
 prompt_case "trailing lines"              "/anchor:commit"         "/mate:fix
 and then tell me what you found"
-pasted_trace=$(printf '/mate:fix\n'; yes '  at Foo.Bar(x) in /src/foo.cs:line 42' | head -n 5000)
-prompt_case "a pasted trace after it"     "/anchor:commit"         "$pasted_trace"
+# Built in a file rather than through `prompt_case`: Linux caps a single argv
+# entry at 128 KB, so a payload this size can't reach jq as `--arg`. The hook
+# reads it off stdin, which has no such cap.
+trace=$(mktemp)
+printf '/mate:fix\n' > "$trace"
+yes '  at Foo.Bar(x) in /src/foo.cs:line 42' 2>/dev/null | head -n 5000 >> "$trace"
+check "a pasted trace after it" "/anchor:commit" \
+  "$(jq -nc --rawfile p "$trace" '{prompt:$p}' | bash "$HOOK" 2>/dev/null || true)"
+rm -f "$trace"
 
 echo ""
 echo "Never sequences — every nudge says not to run the next step:"
