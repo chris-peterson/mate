@@ -55,7 +55,7 @@ suite:
   # invocation arrives in. Nothing at session start.
   activations: [agent, user]
   gloss: The first mate runs the ship day to day and says what's next. The captain still gives the orders.
-  pitch: "Know the next phase without a sequencer running it for you."
+  pitch: "A bug with no known cause, or a feature that isn't built yet? A skill for each, and a line naming what to run when it's done."
   what: "Refine is where the code actually changes, and it has two shapes: a defect whose cause isn't known yet, and a capability that isn't there yet. /fix drives a bug from symptom to shipped fix — root cause, a test that fails for the reason the bug exists, then a sweep for the same bug class. /feature adds capability to a working codebase against the patterns already in it. Between them sits one line of forward pressure: on entering a phase, mate names the phase after it and stops. You type the next command, or you don't."
   # >>> shipyard:describe — generated from source by `shipyard gen-describe`; do not edit >>>
   describe:
