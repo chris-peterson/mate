@@ -49,7 +49,6 @@ echo "Names the next phase when the agent invokes a phase skill:"
 skill_case "tack:start classifies"        "/mate:fix"              "tack:start"
 skill_case "fix -> commit"                "/anchor:commit"         "mate:fix"
 skill_case "feature -> commit"            "/anchor:commit"         "mate:feature"
-skill_case "commit -> code review"        "/code-review"           "anchor:commit"
 skill_case "code review -> prepare"       "/anchor:prepare-review" "code-review"
 skill_case "prepare -> self-review"       "/anchor:review"         "anchor:prepare-review"
 skill_case "review -> merge"              "/anchor:merge"          "anchor:review"
@@ -81,6 +80,13 @@ echo ""
 echo "Never sequences — every nudge says not to run the next step:"
 skill_case "fix nudge is hands-off"       "don't run it" "mate:fix"
 skill_case "start nudge is hands-off"     "Do not invoke either one" "tack:start"
+
+echo ""
+echo "Leaves the commit phase to react.sh, which sees what the commit did:"
+# Entering the commit phase says nothing about how it ends, so the line that
+# follows a commit comes from `commit.pushed` in react.test.sh instead.
+skill_case "commit, agent-invoked"        silent "anchor:commit"
+prompt_case "commit, typed"               silent "/anchor:commit"
 
 echo ""
 echo "Silent on everything else:"

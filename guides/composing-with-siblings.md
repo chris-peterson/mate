@@ -11,7 +11,6 @@ This is the map of who supplies what, and what to do when they aren't there.
 | Open the envelope | `/tack:start [url]` | [tack](https://github.com/chris-peterson/tack) |
 | Make the change | `/mate:fix`, `/mate:feature` | mate |
 | Commit and push | `/anchor:commit` | [anchor](https://github.com/chris-peterson/anchor) |
-| Review the branch | `/code-review` | Claude Code |
 | Open the change request | `/anchor:prepare-review` | anchor |
 | Self-review it | `/anchor:review` | anchor |
 | Merge | `/anchor:merge` | anchor |
@@ -19,9 +18,17 @@ This is the map of who supplies what, and what to do when they aren't there.
 | Close the envelope | `/tack:end` | tack |
 
 mate's hooks name the next link in that chain as one line, once. `nudge.sh`
-names it on entering a phase; `react.sh` names what the change request still
-needs when anchor reports the draft flag came off, which is the one moment the
-URL to hand over exists. Neither runs anything.
+names it on entering a phase. `react.sh` covers the two links a phase's name
+alone can't reach: what follows a commit, which depends on the branch it landed
+on, and what a change request needs once the draft flag comes off, which is the
+one moment the URL to hand over exists. Neither runs anything.
+
+`/anchor:commit` gates on its own review of the pending changeset — only an
+approved verdict commits and pushes — so the review of the branch sits inside
+the commit phase rather than after it. That is why the chain above steps
+straight from the commit to the change request. `/code-review` is yours to run
+whenever a broader pass is worth it, and the nudge points it at
+`/anchor:prepare-review` when you do.
 
 ## What absence costs, and what replaces it
 
@@ -41,8 +48,13 @@ anchor supplies beyond the mechanics is the drafting discipline and the review
 guide; a hand-rolled `gh pr create --body` lands the change request non-draft
 with the project template's checklist intact, so at minimum mark it draft.
 
-**Without `/code-review`.** Read the diff yourself, file by file, against the
-branch point. A launched diff viewer is not evidence anything was read.
+Two things go with it. The commit's review gate is one: read the pending
+changeset yourself, file by file, before committing — `/code-review` over the
+branch covers the same ground, and a launched diff viewer is not evidence
+anything was read. The line after the commit is the other, since it is keyed to
+an announcement only anchor makes; say what the commit's state calls for
+yourself, which on a feature branch is the change request and on the default
+branch is the release or the close.
 
 ## Naming a command the user may not have
 

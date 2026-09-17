@@ -24,12 +24,23 @@ marketplace:
   homepage: https://chris-peterson.github.io/mate/#/
 
 # mate publishes nothing: it causes no artifact a sibling could act on. What it
-# hears is one key. anchor's other events each arrive at a phase the nudge
-# already names from the skill that emits them, and tack records cr.created,
-# cr.updated, cr.merged, issue.created and release.created on the route — a
-# second line about either would be noise, not forward pressure.
+# hears is two keys, each one a fact the nudge's skill-name match cannot reach.
+# anchor's remaining events arrive at a phase the nudge already names from the
+# skill that emits them, and tack records cr.created, cr.updated, cr.merged,
+# issue.created and release.created on the route — a second line about either
+# would be noise, not forward pressure.
 events:
   subscribes:
+    - key: codes.bridgeai.anchor/commit.pushed
+      handled_by: hooks/react.sh
+      reason: >-
+        the nudge fires on entering a phase, so it knows nothing about how the
+        commit ends. This lands after the push, which is downstream of the
+        commit's own review gate — only an approved verdict commits and pushes,
+        so the announcement is itself evidence the diff was read, and the line
+        can name the step after review instead of another review. It also
+        carries the branch, which is what decides whether there is a change
+        request to open at all
     - key: codes.bridgeai.anchor/cr.ready
       handled_by: hooks/react.sh
       reason: >-

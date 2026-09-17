@@ -23,7 +23,7 @@ invokes the next phase on its own.
 ## Composes with
 
 `/tack:start` → **`/mate:fix`** or **`/mate:feature`** → `/anchor:commit` →
-`/code-review` → `/anchor:prepare-review` → `/anchor:merge` →
+`/anchor:prepare-review` → `/anchor:review` → `/anchor:merge` →
 `/anchor:release` → `/tack:end`
 
 [tack](https://github.com/chris-peterson/tack) supplies the envelope the work

@@ -37,6 +37,11 @@ skill=$(printf '%s' "$input" | jq -r '
 
 [ -n "$skill" ] || exit 0
 
+# This fires on *entering* a phase, so an arm knows only which phase was
+# entered. `anchor:commit` is the one phase whose next step depends on what it
+# did — whether it pushed, and onto which branch — so react.sh names that one
+# from anchor's `commit.pushed` announcement, which lands after the push.
+#
 # Bare names are taken only where the bare form is the one this suite actually
 # uses: `code-review` is invoked bare, and `fix`/`feature` are mate's own, so a
 # collision lands on a skill that wants this nudge anyway. `start`, `end`,
@@ -64,12 +69,6 @@ MSG
     cat <<'MSG'
 mate: when this phase is done and the tree is green, the next step is
 `/anchor:commit`. Name it in the wrap-up; don't run it.
-MSG
-    ;;
-  anchor:commit)
-    cat <<'MSG'
-mate: with the commit pushed, the next step is `/code-review` over the branch.
-Name it in the wrap-up; don't run it.
 MSG
     ;;
   code-review)

@@ -23,10 +23,10 @@ just docs              # preview the docsify site locally
 plugin.yml              source of record for metadata and marketplace copy
 hooks/hooks.yml         source of record for the three hook registrations
 hooks/nudge.sh          the nudge — resolves a skill name from both shapes
-hooks/react.sh          the reaction — reads one key off a sibling's stdout
+hooks/react.sh          the reaction — reads two keys off a sibling's stdout
 skills/fix/             the defect skill and its reference files
 skills/feature/         the capability skill and its reference files
-guides/                 the composition contract with tack, anchor, code-review
+guides/                 the composition contract with tack and anchor
 scripts/tests/          bash test suite
 docs/                   docsify site (README, _sidebar, favicon are source)
 ```
@@ -75,21 +75,28 @@ what picks the level.
   and the captured payload is the real one — which is how the shape a hook reads
   gets settled rather than assumed. `grep` the run's `transcript_path` for the
   line to confirm the agent received it, not merely that the script ran.
-- **Both hooks are bash and jq, nothing else.** They run on every prompt and
-  every Bash call in every session where mate is enabled, so the non-matching
-  path is a pattern test and an `exit 0`. No network, no interpreter startup.
+- **The non-matching path is a pattern test and an `exit 0`.** Both hooks run on
+  every prompt and every Bash call in every session where mate is enabled, so
+  what a payload that isn't for mate costs is the budget to protect. Bash and
+  `jq` are the whole toolkit until a key has matched; past that, `react.sh`
+  resolves the default branch with one `git symbolic-ref` on a local ref. No
+  network, no interpreter startup, on any path.
 - **A key another plugin already answers is a key mate leaves alone.** What
-  `react.sh` subscribes to is settled by what nobody else says: the nudge
-  already names the phase for every anchor event emitted by a skill it matches,
-  and tack records the CR, issue and release keys on the route. Before adding a
-  key, read `plugin.yml`'s `events` block for why the others are absent.
+  `react.sh` subscribes to is settled by what nobody else says, and tack already
+  records the CR, issue and release keys on the route. The test against the
+  nudge is narrower than it looks: the nudge fires on *entering* a phase, so it
+  knows which phase was entered and nothing about how it ends. A key carrying
+  what the phase actually did — `commit.pushed`'s branch and sha — is mate's to
+  take; one that merely marks a phase the nudge already names is not. Before
+  adding a key, read `plugin.yml`'s `events` block for why the others are
+  absent.
 - **Stdout is context, not a log.** Anything the hook prints lands in the
   agent's context whether or not it is useful there. Every non-matching path
   prints nothing.
-- **The siblings are optional and the skills say so at each site.** tack,
-  anchor, and `/code-review` each supply a phase; `guides/composing-with-siblings.md`
-  carries what replaces each one when it is absent. A skill step that assumes a
-  sibling is installed is a bug.
+- **The siblings are optional and the skills say so at each site.** tack and
+  anchor each supply phases; `guides/composing-with-siblings.md` carries what
+  replaces each one when it is absent. A skill step that assumes a sibling is
+  installed is a bug.
 
 ## Glossary
 
