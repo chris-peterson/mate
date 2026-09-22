@@ -1,11 +1,20 @@
-# <img src="favicon.svg" alt="mate" width="64" height="64" style="vertical-align: middle"> mate
+<div class="ph-hero" style="--accent: color-mix(in srgb, var(--color-cyan) 54%, light-dark(black, white))">
 
-The two skills that make the change, and one line telling you what's next.
+<h1 class="ph-lede"><span class="ph-name">mate</span> plugins to combine capabilities.</h1>
 
-Refine is where the code actually changes, and it has two shapes: a defect whose
-cause isn't known yet, and a capability that isn't there yet. mate ships a skill
-for each, plus a hook that names the phase after the one you just entered — and
-stops there.
+<div class="ph-badge"><img class="ph-mark" src="favicon.svg" alt="mate" width="26" height="26">
+
+[](_tags.md ':include')
+
+</div>
+
+</div>
+
+mate is the joint the other bridge.ai plugins fit into: it listens for what each
+one announces and names what should run next. Today that is the work where code
+actually changes, a defect whose cause is not known yet and a capability that is
+not there yet, plus one line of forward pressure when a phase begins. You type
+the next command, or you don't.
 
 ## In action
 
@@ -18,7 +27,7 @@ claude plugin marketplace add chris-peterson/claude-marketplace
 claude plugin install mate@chris-peterson
 ```
 
-## The two skills
+## The skills
 
 | | `/mate:fix` | `/mate:feature` |
 |---|---|---|
@@ -101,5 +110,10 @@ keys on the route — so mate says nothing about them rather than saying it twic
 
 ## Why "mate"
 
-The first mate runs the ship day to day, carries the captain's intent into the
-work, and says what's next. The captain still gives the orders.
+To mate two parts is to fit them together so they hold. The bridge.ai plugins
+each announce what they caused, and mate is the joint they fit into: it reads
+those announcements and names what runs next.
+
+Today that joint is narrow. It reaches two of anchor's keys, the phase names the
+nudge resolves from a skill invocation on its own, and the skills where the
+code actually changes. Widening it is the direction the plugin is headed.

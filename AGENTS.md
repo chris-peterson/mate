@@ -1,8 +1,9 @@
 # mate
 
-A Claude Code plugin for the Refine phase: the two skills that make the change,
-plus a nudge layer that names the phase you are about to enter next without
-running it for you.
+A Claude Code plugin that joins the other bridge.ai plugins: it reads what they
+announce and names what should run next. Today that is a nudge layer over the
+skills where the code actually changes, naming the phase you are about to
+enter next without running it for you.
 
 `/mate:fix` drives a bug from symptom to shipped fix. `/mate:feature` adds
 capability to a working codebase. `hooks/nudge.sh` emits one line, on entering

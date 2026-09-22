@@ -1,7 +1,7 @@
 {
   "name": "mate",
   "version": "0.1.0",
-  "description": "The two skills that make the change \u2014 /fix for a defect, /feature for a capability \u2014 plus a hook that names the phase you are about to enter next.",
+  "description": "An event hub for the bridge.ai plugins: reacts to what each one announces, and names what to run next.",
   "author": {
     "name": "chris-peterson"
   },

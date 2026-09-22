@@ -4,7 +4,7 @@
 
 name: mate
 version: 0.1.0
-description: The two skills that make the change — /fix for a defect, /feature for a capability — plus a hook that names the phase you are about to enter next.
+description: "An event hub for the bridge.ai plugins: reacts to what each one announces, and names what to run next."
 author: chris-peterson
 repository: https://github.com/chris-peterson/mate
 keywords: [fix, feature, debugging, tdd, refine, workflow, claude-code]
@@ -65,9 +65,9 @@ suite:
   # Two user-invoked skills, plus hooks that read both shapes a skill
   # invocation arrives in. Nothing at session start.
   activations: [agent, user]
-  gloss: The first mate runs the ship day to day and says what's next. The captain still gives the orders.
-  pitch: "A bug with no known cause, or a feature that isn't built yet? A skill for each, and a line naming what to run when it's done."
-  what: "Refine is where the code actually changes, and it has two shapes: a defect whose cause isn't known yet, and a capability that isn't there yet. /fix drives a bug from symptom to shipped fix — root cause, a test that fails for the reason the bug exists, then a sweep for the same bug class. /feature adds capability to a working codebase against the patterns already in it. Between them sits one line of forward pressure: on entering a phase, mate names the phase after it and stops. You type the next command, or you don't."
+  gloss: mate plugins to combine capabilities.
+  pitch: "Plugins that each do their own thing? mate carries what one announces into what runs next."
+  what: "mate is the joint the other bridge.ai plugins fit into: it listens for what each one announces and names what should run next. Today that is the work where code actually changes, a defect whose cause is not known yet and a capability that is not there yet, plus one line of forward pressure when a phase begins. You type the next command, or you don't."
   # >>> shipyard:describe — generated from source by `shipyard gen-describe`; do not edit >>>
   describe:
     skills:
