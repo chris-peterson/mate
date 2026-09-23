@@ -72,7 +72,7 @@ mate: when this phase is done and the tree is green, the next step is
 
 mate supplies the two in bold. [tack](https://github.com/chris-peterson/tack)
 and [anchor](https://github.com/chris-peterson/anchor) supply the rest, and both
-are optional — a bare `mate` install runs both skills start to finish, and each
+are optional: a bare `mate` install runs both skills start to finish, and each
 step that names a sibling says what to do when it isn't there. The full
 contract is in [Composing with the siblings](/guides/composing-with-siblings).
 
@@ -84,13 +84,13 @@ against the same script, so the line arrives whichever way the phase was
 entered.
 
 Two lines arrive by a different road. The suite's plugins announce what they
-caused on a command's stdout, and mate subscribes to two of anchor's keys —
-each one a fact a command name can never carry.
+caused on a command's stdout, and mate subscribes to the anchor keys that
+carry a fact a command name can never carry.
 
 `commit.pushed` carries the sha and the branch, and lands only once the push
 has. That matters because the nudge fires on *entering* a phase: when you type
 `/anchor:commit`, nothing about that commit has happened yet. By the time the
-announcement arrives, two things are known. The changeset has been read —
+announcement arrives, two things are known. The changeset has been read:
 `/anchor:commit` opens the pending diff in a review tool and commits only on an
 approved verdict, so a push is evidence of a review, and recommending another
 one would be asking you to read the same diff twice. And the branch is known,
@@ -106,7 +106,7 @@ the reaction leaves it alone.
 
 Everything else anchor announces already lands on a phase the nudge names, and
 [tack](https://github.com/chris-peterson/tack) records the CR, issue and release
-keys on the route — so mate says nothing about them rather than saying it twice.
+keys on the route, so mate says nothing about them rather than saying it twice.
 
 ## Why "mate"
 
