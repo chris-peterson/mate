@@ -5,6 +5,7 @@
 docs/*
 !docs/README.md
 !docs/_sidebar.md
+!docs/workflow.md
 !docs/favicon.svg
 
 __pycache__

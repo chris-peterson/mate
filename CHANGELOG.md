@@ -32,3 +32,7 @@
   pipeline's state.
 - `guides/composing-with-siblings.md` — which sibling supplies which phase, and
   what replaces each one when it isn't installed.
+- The docs site's Workflow page — every line mate prints, as
+  if-this-then-that, with the flowchart of the chain and how strong the signal
+  behind each step is. The Requirements and
+  Coverage pages list each rule by ID and what the code covers.
