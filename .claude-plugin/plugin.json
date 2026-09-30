@@ -1,6 +1,6 @@
 {
   "name": "mate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An event hub for the bridge.ai plugins: reacts to what each one announces, and names what to run next.",
   "author": {
     "name": "chris-peterson"
