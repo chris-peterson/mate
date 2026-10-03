@@ -14,7 +14,7 @@ a phase, naming the phase after it.
 ```bash
 just test              # the bash test suite under scripts/tests/
 just generate          # regenerate plugin.json, hooks.json, docs/ from source
-just check             # the same, then diff what the projection job would commit
+just check-generated   # the same, then list what the projection job would commit
 just docs              # preview the docsify site locally
 ```
 
