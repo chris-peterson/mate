@@ -16,5 +16,6 @@
     "workflow",
     "claude-code"
   ],
-  "homepage": "https://chris-peterson.github.io/mate/#/"
+  "homepage": "https://chris-peterson.github.io/mate/#/",
+  "documentationUrl": "https://chris-peterson.github.io/mate/#/"
 }
