@@ -69,7 +69,8 @@ prompt shall not match.
 #### `NUDGE-03`
 When `/tack:start` is entered, the nudge shall ask the agent to classify the
 linked work as a defect or a capability and name `/mate:fix` or
-`/mate:feature`, without invoking either.
+`/mate:feature`, without invoking either, and tell the agent to carry on with
+the skill that opened the route when one did.
 
 #### `NUDGE-04`
 When `/tack:start` is entered with an `https` URL in the prompt, the nudge shall
@@ -136,17 +137,17 @@ The react hook shall delete its one-shot markers after 7 days.
 The fix and feature skills
 
 #### `SKILL-01`
-Where tack is installed and no route resolves, each skill shall say so and let
-the user type `/tack:start`; where tack is absent, the skill shall do the
-envelope by hand.
+Where tack is installed and no route resolves, each skill shall invoke
+`/tack:start` with the work the user named and continue; where tack is absent,
+the skill shall do the envelope by hand.
 
 #### `SKILL-02`
 Where anchor is absent, the skills shall say what replaces the commit, change
 request, merge, and release phases.
 
 #### `SKILL-03`
-`/mate:fix` shall prove the defect with a test that fails before the fix and
-passes after.
+`/mate:fix` shall prove the fix with a check that fails before it and passes
+after: a test it writes, or the failing run that reported the defect.
 
 #### `SKILL-04`
 `/mate:fix` shall sweep for the same bug class before shipping.
@@ -156,3 +157,8 @@ passes after.
 
 #### `SKILL-06`
 Each skill shall name the next phase in its wrap-up rather than invoke it.
+
+#### `SKILL-07`
+When the check that proves a fix is a run that already existed, `/mate:fix`
+shall report it as that run failing and then passing, without the RED and GREEN
+labels.

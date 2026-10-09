@@ -23,6 +23,12 @@ alone can't reach: what follows a commit, which depends on the branch it landed
 on, and what a change request needs once the draft flag comes off, which is the
 one moment the URL to hand over exists. Neither runs anything.
 
+The envelope is the one link a skill opens itself. `/mate:feature 42` already
+names the work, so the skill invokes `/tack:start` for it rather than asking for
+the same reference a second time. It is the precondition of the phase the user
+just entered, not the phase after it; every link after the skill stays a line
+the user acts on or ignores.
+
 `/anchor:commit` gates on its own review of the pending changeset — only an
 approved verdict commits and pushes — so the review of the branch sits inside
 the commit phase rather than after it. That is why the chain above steps

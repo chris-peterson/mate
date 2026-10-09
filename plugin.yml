@@ -72,7 +72,7 @@ suite:
   describe:
     skills:
       feature: Add a capability to an existing codebase — gather the constraints that prevent false starts, implement one feature at a time against the repo's existing patterns, verify each against real feedback, then consolidate before merge.
-      fix: Diagnose a bug whose cause isn't known yet — root-cause it, prove it with a failing test, then sweep for the same bug class.
+      fix: Diagnose a bug whose cause isn't known yet — root-cause it, prove the fix against something that failed before it (a new test, or the CI run that already did), then sweep for the same bug class.
     hooks:
       hooks: 'Hook wiring: PostToolUse→nudge (Skill), react (Bash); UserPromptSubmit→nudge.'
       nudge: PostToolUse / UserPromptSubmit — Names the phase that follows the one just entered, as one line the user acts on or ignores.
@@ -95,7 +95,7 @@ suite:
     - { t: you, text: "why is the nightly job red only on arm64" }
     - { t: claude, text: "That's a defect with no known cause and no route open for this session." }
     - { t: event, text: "mate names the skill: /mate:fix" }
-    - { t: cmd, cmd: "/mate:fix", out: "diagnosis → RED → GREEN → sweep · next: /anchor:commit" }
+    - { t: cmd, cmd: "/mate:fix", out: "diagnosis → fix → the arm64 job passes → sweep · next: /anchor:commit" }
     - { t: note, text: "Every line mate emits is a suggestion. Nothing here ran a phase on its own." }
 
 docs:

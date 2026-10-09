@@ -14,6 +14,8 @@ Link whatever is found in the change request so reviewers see the whole causal c
 
 **Visible.** RED can take seconds and scrolls away. Announce it ("Step 1/3: confirming RED — running tests…"), report the failure summary ("6 failures, all matching the reported error"), and **restate it in the phase or wrap-up summary** where a reviewer arriving later actually looks: `RED confirmed (N tests fail against current code) → GREEN (all pass with the fix)`. Real-but-invisible is the recurring failure — on one fix the discipline *was* followed and two independent parties still missed it.
 
+The labels belong to a test the session wrote. When the failing check was a CI job or a build that already existed, restate it as that job failing and then passing, with both run links, rather than as RED and GREEN.
+
 **Provable retroactively.** When asked "if you comment out the fix, do the new tests fail?", answer with evidence. Restore only the production file to its pre-fix state, run the new tests, watch the intended cases fail, then restore:
 
 ```bash

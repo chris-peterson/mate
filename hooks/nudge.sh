@@ -63,6 +63,8 @@ known) or a capability — then say in one line which skill fits:
                  patterns, verify each against real feedback
 
 Say which and why in one sentence. Do not invoke either one; the user types it.
+If /mate:fix or /mate:feature opened this route, that skill is the answer:
+carry on with it.
 MSG
     ;;
   mate:fix|fix|mate:feature|feature)

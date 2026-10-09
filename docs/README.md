@@ -53,6 +53,10 @@ and only that half.
 | Who runs the next step | the skill | you, by typing it |
 | Fix vs feature | you pick | mate classifies from the issue |
 
+Opening the envelope is the agent's job too. `/mate:fix 42` already says which
+work to open, so the skill runs `/tack:start` for it instead of asking you to type
+the same reference again.
+
 The classification is the agent's call rather than a question put to you: on
 `/tack:start` the nudge names both skills and asks the agent to read the issue's
 labels and description and say in one line which one fits.

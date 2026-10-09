@@ -80,6 +80,7 @@ echo ""
 echo "Never sequences — every nudge says not to run the next step:"
 skill_case "fix nudge is hands-off"       "don't run it" "mate:fix"
 skill_case "start nudge is hands-off"     "Do not invoke either one" "tack:start"
+skill_case "start nudge defers to a skill" "carry on with it"        "tack:start"
 
 echo ""
 echo "Leaves the commit phase to react.sh, which sees what the commit did:"
