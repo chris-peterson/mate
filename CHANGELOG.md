@@ -4,17 +4,12 @@
 
 ### Changed
 
-- `/mate:fix` and `/mate:feature` open the envelope themselves. With tack
-  installed and no route bound, the skill invokes `/tack:start` for the work you
-  named (`/mate:feature 42` resolves `42` against the origin remote) and carries
-  on, instead of asking you to type the same reference again.
-- `/mate:fix` uses the failing check a defect already comes with. When a CI
-  job, build, or deploy is what failed, that run is the proof: the skill fixes
-  it, shows the same job passing, and reports it in those terms rather than as
-  RED and GREEN. A new test is added where it would catch the defect earlier.
-- The `/tack:start` nudge tells the agent to carry on when `/mate:fix` or
-  `/mate:feature` opened the route, so a skill-driven start doesn't come back
-  asking which skill to run.
+- `/mate:feature 42` and `/mate:fix 42` start working right away: with tack
+  installed, the skill runs `/tack:start` for that issue itself instead of
+  asking you to type it.
+- `/mate:fix` treats a failed CI job, build, or deploy as its own proof: it
+  reports the job failing and then passing, without RED/GREEN labels or a test
+  written only to fail.
 
 ## 0.2.0
 
