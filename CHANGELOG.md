@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Work that didn't start from `/tack:start`, `/mate:fix` or `/mate:feature`
+  still gets recorded on tack: the first edit inside the repo, and the first
+  push, each ask the agent to bind the session to a tack until tack reports it
+  has heard of the session. With no tack CLI installed, nothing changes.
+
+### Fixed
+
+- The lines mate prints after a tool call now reach the agent: the step after
+  `/anchor:commit`'s push, what a change request needs once it leaves draft,
+  and the next phase when the agent (rather than you) invokes a skill. Each
+  used to land in the transcript only.
+
 ## 0.2.1
 
 ### Changed

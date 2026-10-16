@@ -29,6 +29,12 @@ the same reference a second time. It is the precondition of the phase the user
 just entered, not the phase after it; every link after the skill stays a line
 the user acts on or ignores.
 
+Work that never opened the envelope still has to reach tack. `underway.sh`
+speaks on the first edit inside the repo, and `react.sh` again on the first
+push, each asking the agent to bind the session to a tack until tack announces
+`session.started` for it. Binding is a record of work already happening rather
+than a phase, so these lines ask for it to be done.
+
 `/anchor:commit` gates on its own review of the pending changeset — only an
 approved verdict commits and pushes — so the review of the branch sits inside
 the commit phase rather than after it. That is why the chain above steps

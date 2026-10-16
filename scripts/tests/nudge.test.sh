@@ -30,10 +30,18 @@ check() {
   esac
 }
 
-# The agent invoked it: a Skill tool call.
+# The agent invoked it: a Skill tool call. The line has to arrive as
+# PostToolUse additionalContext to reach the agent, so a case reads that text,
+# and output in any other shape comes back marked rather than passing.
 skill_case() {
-  check "$1" "$2" \
-    "$(jq -nc --arg s "$3" '{tool_name:"Skill",tool_input:{skill:$s}}' | bash "$HOOK" 2>/dev/null || true)"
+  local raw
+  raw=$(jq -nc --arg s "$3" '{tool_name:"Skill",tool_input:{skill:$s}}' | bash "$HOOK" 2>/dev/null || true)
+  if [ -n "$raw" ]; then
+    raw=$(printf '%s' "$raw" \
+      | jq -er 'select(.hookSpecificOutput.hookEventName == "PostToolUse") | .hookSpecificOutput.additionalContext' 2>/dev/null \
+      || echo NOT-CONTEXT)
+  fi
+  check "$1" "$2" "$raw"
 }
 
 # The user typed it: no tool call, the prompt is the whole event.

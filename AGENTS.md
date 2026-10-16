@@ -7,7 +7,9 @@ enter next without running it for you.
 
 `/mate:fix` drives a bug from symptom to shipped fix. `/mate:feature` adds
 capability to a working codebase. `hooks/nudge.sh` emits one line, on entering
-a phase, naming the phase after it.
+a phase, naming the phase after it. `hooks/underway.sh` and `hooks/react.sh`
+press for the session to be bound to a tack once work is underway, until tack
+announces it has heard of the session.
 
 ## Commands
 
@@ -22,9 +24,10 @@ just docs              # preview the docsify site locally
 
 ```text
 plugin.yml              source of record for metadata and marketplace copy
-hooks/hooks.yml         source of record for the three hook registrations
+hooks/hooks.yml         source of record for the hook registrations
 hooks/nudge.sh          the nudge — resolves a skill name from both shapes
-hooks/react.sh          the reaction — reads two keys off a sibling's stdout
+hooks/react.sh          the reaction — reads the subscribed keys off a sibling's stdout
+hooks/underway.sh       presses for a tack binding on the first edit in the repo
 skills/fix/             the defect skill and its reference files
 skills/feature/         the capability skill and its reference files
 guides/                 the composition contract with tack and anchor
@@ -56,7 +59,9 @@ what picks the level.
   or ignores. A step that invokes the next phase on its own has rebuilt the
   sequencer this plugin exists to replace half of. The design note is in
   `docs/README.md`; it is the one constraint to hold when editing either skill
-  or the hook.
+  or the hook. The tack binding is the one exception: `underway.sh` and
+  `react.sh` ask for it to be done, because binding records work already
+  underway and runs no phase.
 - **The hook reads both shapes a skill invocation arrives in.** A slash command
   the user types fires no `Skill` tool call at all; only an agent-invoked skill
   produces one. A `PostToolUse` matcher on `Skill` alone is silently inert for
@@ -74,14 +79,18 @@ what picks the level.
 
   Point `capture.json` at a hook of your own that appends its stdin to a file,
   and the captured payload is the real one — which is how the shape a hook reads
-  gets settled rather than assumed. `grep` the run's `transcript_path` for the
-  line to confirm the agent received it, not merely that the script ran.
-- **The non-matching path is a pattern test and an `exit 0`.** Both hooks run on
-  every prompt and every Bash call in every session where mate is enabled, so
-  what a payload that isn't for mate costs is the budget to protect. Bash and
-  `jq` are the whole toolkit until a key has matched; past that, `react.sh`
-  resolves the default branch with one `git symbolic-ref` on a local ref. No
-  network, no interpreter startup, on any path.
+  gets settled rather than assumed. The line appearing in the run's
+  `transcript_path` proves only that the script ran: a PostToolUse hook's plain
+  stdout is recorded there as `hook_success` and never reaches the agent. Have
+  the prompt ask the agent to quote every `mate:` line it received, and read
+  its answer.
+- **The non-matching path is a pattern test and an `exit 0`.** The hooks run on
+  every prompt, every Bash call and every edit in every session where mate is
+  enabled, so what a payload that isn't for mate costs is the budget to protect.
+  Bash and `jq` are the whole toolkit until a key has matched; past that,
+  `react.sh` resolves the default branch with one `git symbolic-ref` on a local
+  ref, and `underway.sh` finds the repo with one `git rev-parse`. No network, no
+  interpreter startup, on any path.
 - **A key another plugin already answers is a key mate leaves alone.** What
   `react.sh` subscribes to is settled by what nobody else says, and tack already
   records the CR, issue and release keys on the route. The test against the
@@ -91,8 +100,12 @@ what picks the level.
   take; one that merely marks a phase the nudge already names is not. Before
   adding a key, read `plugin.yml`'s `events` block for why the others are
   absent.
-- **Stdout is context, not a log.** Anything the hook prints lands in the
-  agent's context whether or not it is useful there. Every non-matching path
+- **A line reaches the agent only through the channel its event reads.**
+  UserPromptSubmit adds plain stdout to the agent's context. PostToolUse puts
+  plain stdout in the transcript alone, so every PostToolUse line goes out as
+  `{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":…}}`.
+  The tests decode that JSON and fail on anything else. Either way, what lands
+  is context whether or not it is useful there, so every non-matching path
   prints nothing.
 - **The siblings are optional and the skills say so at each site.** tack and
   anchor each supply phases; `guides/composing-with-siblings.md` carries what

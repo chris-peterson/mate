@@ -52,7 +52,12 @@ session state.
 
 #### `HOOK-05`
 Every line mate prints shall name the next step and tell the agent not to run
-it.
+it, except the `TRACK` lines, which ask for the tack binding to be done.
+
+#### `HOOK-06`
+When a hook prints a line from a `PostToolUse` event, it shall print it as
+`hookSpecificOutput.additionalContext` JSON, the only `PostToolUse` output that
+reaches the agent.
 
 ### `NUDGE`
 Phase nudges
@@ -132,6 +137,36 @@ request still needs (a reviewer and the pipeline's state), once per session.
 
 #### `REACT-07`
 The react hook shall delete its one-shot markers after 7 days.
+
+### `TRACK`
+Getting tack told about work already underway
+
+#### `TRACK-01`
+When tack announces `session.started` for the current session, or with no
+session field, the react hook shall mark the session as heard by tack and print
+nothing.
+
+#### `TRACK-02`
+When the agent first edits a file under the session's cwd in a git repo, while
+tack hasn't been heard for the session, the underway hook shall ask the agent to
+bind the session to a tack, naming `tack session` with the session id, and to
+ask the user about `/tack:start` when no route resolves.
+
+#### `TRACK-03`
+When anchor announces `commit.pushed` with a sha while tack hasn't been heard
+for the session, the react hook shall ask the agent to bind the session to a
+tack, whatever the branch.
+
+#### `TRACK-04`
+Each `TRACK` line shall be printed at most once per session per hook.
+
+#### `TRACK-05`
+If the tack CLI isn't on `PATH`, then neither hook shall print a `TRACK` line.
+
+#### `TRACK-06`
+If the edited file lies outside the session's cwd, or the cwd isn't in a git
+repo, then the underway hook shall print nothing and leave its once-per-session
+line unspent.
 
 ### `SKILL`
 The fix and feature skills

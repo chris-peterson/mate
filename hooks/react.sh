@@ -10,7 +10,11 @@
 # The grammar and the publishing rules are the suite's interop contract:
 # https://github.com/chris-peterson/claude-marketplace/blob/main/authoring/plugin-contract.md
 #
-# Two keys are read, each for something a skill-name match cannot supply.
+# Three keys are read, each for something a skill-name match cannot supply.
+#
+# `codes.bridgeai.tack/session.started` says tack has heard of this session,
+# which nothing else mate sees can establish. It prints nothing; it marks the
+# session so underway.sh and the push line below stop pressing for a binding.
 #
 # `commit.pushed` carries the sha and the branch, and it is announced only once
 # the push has landed — which is downstream of `/anchor:commit`'s own review of
@@ -29,12 +33,18 @@
 # Matching what anchor says rather than the shape of the command it ran is what
 # lets anchor change forge CLIs without silently taking these lines out.
 #
-# Stdout is injected into the agent's context, so every path that isn't a match
-# prints nothing and exits 0.
+# A PostToolUse hook's plain stdout reaches the transcript and never the agent,
+# so the lines are collected and handed over once, as additionalContext. Every
+# path that isn't a match prints nothing and exits 0.
 
 set -euo pipefail
 
 input=$(cat)
+
+context=""
+say() {
+  context="${context:+$context$'\n\n'}$(cat)"
+}
 
 session_id=$(printf '%s' "$input" | jq -r '.session_id // empty' 2>/dev/null || true)
 [ -n "$session_id" ] || exit 0
@@ -52,7 +62,7 @@ output=$(printf '%s' "$input" | jq -r '.tool_response.stdout // empty' 2>/dev/nu
 announced() {
   local line
   line=$(printf '%s' "$output" \
-    | grep -E "^codes\.bridgeai\.anchor/$1[[:space:]]" \
+    | grep -E "^codes\.bridgeai\.$1[[:space:]]" \
     | head -n 1 || true)
   [ -n "$line" ] || return 0
   printf '%s' "$line" | sed 's|^[^[:space:]]*[[:space:]]*||'
@@ -69,7 +79,21 @@ claim() {
   touch "$marker"
 }
 
-body=$(announced 'commit\.pushed')
+# The announcement is for the session that ran the command, so a body naming a
+# different one is a bind made on someone else's behalf.
+body=$(announced 'tack/session\.started')
+if [ -n "$body" ]; then
+  for_session=$(printf '%s' "$body" | jq -r '.session // empty' 2>/dev/null || true)
+  if [ -z "$for_session" ] || [ "$for_session" = "$session_id" ]; then
+    claim tack-heard "$session_id" || true
+  fi
+fi
+
+tack_heard() {
+  [ -f "${TMPDIR:-/tmp}/mate-tack-heard/${session_id//[^A-Za-z0-9._-]/_}" ]
+}
+
+body=$(announced 'anchor/commit\.pushed')
 if [ -n "$body" ]; then
   sha=$(printf '%s' "$body" | jq -r '.sha // empty' 2>/dev/null || true)
   branch=$(printf '%s' "$body" | jq -r '.branch // empty' 2>/dev/null || true)
@@ -88,13 +112,13 @@ if [ -n "$body" ]; then
   if [ -n "$sha" ] && [ -n "$branch" ] && [ -n "$default" ] \
     && claim commit-pushed "${session_id}-${sha}"; then
     if [ "$branch" = "$default" ]; then
-      cat <<MSG
+      say <<MSG
 mate: ${sha} landed on ${branch}, so there is no change request to open.
 If this is shippable on its own the next step is \`/anchor:release\`; otherwise
 the close is \`/tack:end\`. Name it in the wrap-up; don't run it.
 MSG
     else
-      cat <<MSG
+      say <<MSG
 mate: ${sha} is pushed to ${branch}.
 \`/anchor:commit\` commits only on an approved review, so this changeset has
 already been read once — the next step is \`/anchor:prepare-review\` to open the
@@ -102,16 +126,29 @@ change request. Name it in the wrap-up; don't run it.
 MSG
     fi
   fi
+
+  # A pushed commit is the work's first durable artifact, so a session tack
+  # still hasn't heard of is pressed once more here, whatever underway.sh said
+  # at the first edit. Unlike the line above, it needs no default branch.
+  if [ -n "$sha" ] && ! tack_heard && command -v tack >/dev/null 2>&1 \
+    && claim tack-pushed "$session_id"; then
+    say <<MSG
+mate: tack still hasn't heard which work ${sha} belongs to. Bind the session now
+so what lands is recorded: \`tack session <slug> ${session_id} --tack <id>\`,
+running \`tack add <slug> "<summary>"\` first when no open tack fits. When no
+route resolves, ask the user whether to run \`/tack:start\`.
+MSG
+  fi
 fi
 
-body=$(announced 'cr\.ready')
+body=$(announced 'anchor/cr\.ready')
 if [ -n "$body" ]; then
   uri=$(printf '%s' "$body" | jq -r '.uri // empty' 2>/dev/null || true)
   target=${uri:-the change request}
 
   # Once per session: a change request marked ready twice is still one handoff.
   if claim cr-ready "$session_id"; then
-    cat <<MSG
+    say <<MSG
 mate: ${target} is out of draft, so it is ready for eyes that aren't yours. Say
 in one line what it still needs:
 
@@ -121,6 +158,11 @@ in one line what it still needs:
 Say it in the wrap-up; don't act on it.
 MSG
   fi
+fi
+
+if [ -n "$context" ]; then
+  jq -nc --arg m "$context" \
+    '{hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:$m}}'
 fi
 
 exit 0

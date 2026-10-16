@@ -17,6 +17,27 @@ TMPROOT="$(mktemp -d)"
 trap 'rm -rf "$TMPROOT"' EXIT
 SESSION_SEQ=0
 
+# Whether the tack CLI is on PATH changes what a push says, so the hook runs on
+# a PATH built from jq and git alone, and the tack cases put a stub in front.
+NOTACK_PATH="$(dirname "$(command -v jq)"):$(dirname "$(command -v git)"):/usr/bin:/bin"
+TACK_STUB="$TMPROOT/stub"
+mkdir -p "$TACK_STUB"
+printf '#!/bin/sh\nexit 0\n' > "$TACK_STUB/tack"
+chmod +x "$TACK_STUB/tack"
+HOOK_PATH="$NOTACK_PATH"
+
+# The hook answers in PostToolUse's JSON, so a case reads the text the agent
+# receives. Output that isn't that JSON comes back marked, so it can't pass as
+# silence or as a match.
+run_hook() {
+  local raw
+  raw=$(TMPDIR="$TMPROOT" PATH="$HOOK_PATH" bash "$HOOK" 2>/dev/null || true)
+  [ -n "$raw" ] || return 0
+  printf '%s' "$raw" \
+    | jq -er 'select(.hookSpecificOutput.hookEventName == "PostToolUse") | .hookSpecificOutput.additionalContext' 2>/dev/null \
+    || echo NOT-CONTEXT
+}
+
 check() {
   local label="$1" expected="$2" result="$3"
   TOTAL=$((TOTAL + 1))
@@ -44,7 +65,7 @@ check() {
 announced() {
   jq -nc --arg o "$1" --arg s "$2" --arg c "${3-}" \
     '{session_id:$s,cwd:$c,tool_name:"Bash",tool_response:{stdout:$o}}' \
-    | TMPDIR="$TMPROOT" bash "$HOOK" 2>/dev/null || true
+    | run_hook
 }
 
 # Which line a commit.pushed draws turns on the repo's default branch, so the
@@ -115,11 +136,40 @@ stdout_case "no sha field"             silent \
 react_as() {
   jq -nc --arg o "$1" --arg c "$REPO" \
     '{session_id:"sess-pushed",cwd:$c,tool_name:"Bash",tool_response:{stdout:$o}}' \
-    | TMPDIR="$TMPROOT" bash "$HOOK" 2>/dev/null || true
+    | run_hook
 }
 check "first push speaks"  "abc1234" "$(react_as "$(pushed feature-x abc1234)")"
 check "same sha is silent" silent    "$(react_as "$(pushed feature-x abc1234)")"
 check "an amend speaks"    "def5678" "$(react_as "$(pushed feature-x def5678)")"
+
+echo ""
+echo "Presses for a tack binding on a push tack hasn't heard of:"
+HOOK_PATH="$TACK_STUB:$NOTACK_PATH"
+stdout_case "names the binding"        "tack session <slug> sess-"  "$(pushed feature-x)"
+stdout_case "carries the sha"          "which work abc1234"         "$(pushed feature-x)"
+stdout_case "offers /tack:start"       "/tack:start"                "$(pushed feature-x)"
+stdout_case "on the default branch"    "tack session"               "$(pushed main)"
+stdout_case "without origin/HEAD"      "tack session"               "$(pushed feature-x)" "$NOHEAD"
+
+# Hearing tack's announcement silences the press for that session only. Each
+# block drives one session id by hand, since `stdout_case` mints a fresh one.
+react_session() {
+  jq -nc --arg o "$1" --arg s "$2" --arg c "$REPO" \
+    '{session_id:$s,cwd:$c,tool_name:"Bash",tool_response:{stdout:$o}}' \
+    | run_hook
+}
+check "session.started is silent" silent \
+  "$(react_session 'codes.bridgeai.tack/session.started {"session":"sess-heard","route":"r"}' sess-heard)"
+check "a heard session isn't pressed" silent \
+  "$(react_session "$(pushed feature-x)" sess-heard | grep -F 'tack session' || true)"
+react_session 'codes.bridgeai.tack/session.started {"session":"sess-other","route":"r"}' sess-mine >/dev/null
+check "another session's bind doesn't count" "tack session" \
+  "$(react_session "$(pushed feature-x)" sess-mine)"
+check "pressed once per session" silent \
+  "$(react_session "$(pushed feature-x def5678)" sess-mine | grep -F 'tack session' || true)"
+HOOK_PATH="$NOTACK_PATH"
+
+stdout_absent_case "no tack CLI, no press" "tack session"       "$(pushed feature-x)"
 
 echo ""
 echo "Names what the change request still needs:"
@@ -151,15 +201,15 @@ stdout_case "empty stdout"             silent ''
 # The guard is per session, so this one drives a single id twice by hand rather
 # than through `announced`, which mints a fresh id each call.
 payload=$(jq -nc --arg o "$READY" '{session_id:"sess-repeat",tool_name:"Bash",tool_response:{stdout:$o}}')
-first=$(printf '%s' "$payload" | TMPDIR="$TMPROOT" bash "$HOOK" 2>/dev/null || true)
-second=$(printf '%s' "$payload" | TMPDIR="$TMPROOT" bash "$HOOK" 2>/dev/null || true)
+first=$(printf '%s' "$payload" | run_hook)
+second=$(printf '%s' "$payload" | run_hook)
 check "first ready speaks" "ready for eyes that aren't yours" "$first"
 check "second ready is silent" silent "$second"
 
 # A payload with no session id can't be guarded, so it says nothing rather than
 # repeating on every announcement the session makes.
 check "no session id" silent \
-  "$(jq -nc --arg o "$READY" '{tool_name:"Bash",tool_response:{stdout:$o}}' | TMPDIR="$TMPROOT" bash "$HOOK" 2>/dev/null || true)"
+  "$(jq -nc --arg o "$READY" '{tool_name:"Bash",tool_response:{stdout:$o}}' | run_hook)"
 
 echo ""
 echo "========================================="

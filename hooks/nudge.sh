@@ -13,8 +13,10 @@
 # Registering only the first is inert for everything a human types, which is
 # most of what these phases see.
 #
-# Stdout is injected into the agent's context, so every path that isn't a match
-# prints nothing and exits 0.
+# A typed command's line goes out on plain stdout, which UserPromptSubmit adds
+# to the agent's context. An agent-invoked skill's line goes out as
+# additionalContext, since a PostToolUse hook's plain stdout reaches only the
+# transcript. Every path that isn't a match prints nothing and exits 0.
 
 set -euo pipefail
 
@@ -48,7 +50,7 @@ skill=$(printf '%s' "$input" | jq -r '
 # `commit`, `merge` and `release` are generic enough that a stranger's skill
 # would draw a nudge about a pipeline it has nothing to do with, and each of
 # them is namespaced in every install that has it.
-case "$skill" in
+msg=$(case "$skill" in
   tack:start)
     url=$(printf '%s' "$input" | jq -r '(.prompt // "") | [scan("https://[^ )\n]+")] | .[0] // ""' 2>/dev/null || true)
     target=${url:-the linked issue}
@@ -106,6 +108,14 @@ wrap-up; don't run it.
 MSG
     ;;
   *)
-    exit 0
     ;;
-esac
+esac)
+
+[ -n "$msg" ] || exit 0
+
+if printf '%s' "$input" | jq -e '(.tool_input.skill // "") != ""' >/dev/null 2>&1; then
+  jq -nc --arg m "$msg" \
+    '{hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:$m}}'
+else
+  printf '%s\n' "$msg"
+fi

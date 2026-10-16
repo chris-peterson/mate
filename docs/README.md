@@ -112,6 +112,25 @@ Everything else anchor announces already lands on a phase the nudge names, and
 [tack](https://github.com/chris-peterson/tack) records the CR, issue and release
 keys on the route, so mate says nothing about them rather than saying it twice.
 
+## Getting tack told
+
+Plenty of work starts from a plain prompt rather than `/tack:start` or a mate
+skill, and that work reaches its commit with tack told nothing, so `/tack:end`
+has nothing to close and the sessions view can't say what the session is on. mate
+listens for tack's `session.started` announcement, which is the evidence tack
+has heard of the session. Until it arrives, two moments draw a line:
+
+| Moment | Why then |
+|---|---|
+| the first edit to a file inside the repo | the earliest point the session is plainly work rather than a question |
+| the first `commit.pushed` | the work now has a durable artifact, whatever was said at the edit |
+
+Each line asks the agent to bind the session to the tack it drives (adding one
+when none fits), or to ask you about `/tack:start` when no route resolves. This
+is the one place mate asks for something to be done rather than named: binding
+is bookkeeping on the record the work already lives in, not a phase of the
+chain. With no tack CLI installed, neither line appears.
+
 ## Why "mate"
 
 To mate two parts is to fit them together so they hold. The bridge.ai plugins
