@@ -92,8 +92,8 @@ suite:
       ac: "--orient"
       frames:
         - { t: you, text: "/tack:start https://github.com/acme/api/issues/412" }
-        - { t: claude, text: "Route opened. The issue is labelled `bug` and the description has a stack trace with no known cause — that's a defect, so `/mate:fix` is the fit rather than `/mate:feature`." }
-        - { t: status, text: "mate classified it; the user types the command" }
+        - { t: claude, text: "Route opened. The issue is labelled `bug` and the description has a stack trace with no known cause — that's a defect, so `/mate:fix` is the fit rather than `/mate:feature`. Starting it now." }
+        - { t: status, text: "mate classified it and the agent started /mate:fix" }
     - label: "Finishing a fix"
       ac: "--green"
       frames:

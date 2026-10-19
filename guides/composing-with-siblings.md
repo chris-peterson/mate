@@ -23,11 +23,13 @@ alone can't reach: what follows a commit, which depends on the branch it landed
 on, and what a change request needs once the draft flag comes off, which is the
 one moment the URL to hand over exists. Neither runs anything.
 
-The envelope is the one link a skill opens itself. `/mate:feature 42` already
-names the work, so the skill invokes `/tack:start` for it rather than asking for
-the same reference a second time. It is the precondition of the phase the user
-just entered, not the phase after it; every link after the skill stays a line
-the user acts on or ignores.
+The link between the envelope and the skill is the one the agent crosses on its
+own, in either direction. `/mate:feature 42` already names the work, so the
+skill invokes `/tack:start` for it rather than asking for the same reference a
+second time. `/tack:start 42` already asks for the work, so the nudge has the
+agent classify it and invoke `/mate:fix` or `/mate:feature`. Opening the
+envelope and starting the work are one request; every link after the skill
+stays a line the user acts on or ignores.
 
 Work that never opened the envelope still has to reach tack. `underway.sh`
 speaks on the first edit inside the repo, and `react.sh` again on the first

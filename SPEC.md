@@ -73,9 +73,9 @@ prompt shall not match.
 
 #### `NUDGE-03`
 When `/tack:start` is entered, the nudge shall ask the agent to classify the
-linked work as a defect or a capability and name `/mate:fix` or
-`/mate:feature`, without invoking either, and tell the agent to carry on with
-the skill that opened the route when one did.
+linked work as a defect or a capability, name `/mate:fix` or `/mate:feature`,
+and invoke it for the same work; to stop when neither fits; and to carry on
+with the skill that opened the route when one did.
 
 #### `NUDGE-04`
 When `/tack:start` is entered with an `https` URL in the prompt, the nudge shall

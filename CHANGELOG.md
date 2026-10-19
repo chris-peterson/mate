@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Changed
+
+- `/tack:start` now gets right to work: the agent decides whether the issue
+  is a defect or a capability and runs `/mate:fix` or `/mate:feature` itself,
+  instead of naming it and waiting for you to type it.
+
 ### Added
 
 - Work that didn't start from `/tack:start`, `/mate:fix` or `/mate:feature`

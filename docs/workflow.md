@@ -66,12 +66,13 @@ The line says what to run once the phase is done.
 ### `/tack:start`
 
 **Then:** mate asks the agent to read the linked issue's labels and description,
-decide whether it's a defect or a capability, and say which skill fits:
+decide whether it's a defect or a capability, say which skill fits, and run it:
 
 - a defect whose cause isn't known yet → `/mate:fix`
 - a capability the codebase doesn't have → `/mate:feature`
 
-The agent names one; it doesn't start it.
+This is the one transition the agent takes without you. When neither fits, it
+says so and stops.
 
 ### `/mate:fix` or `/mate:feature`
 

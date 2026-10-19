@@ -22,8 +22,9 @@ claude plugin install mate@chris-peterson
 | `/mate:feature` | a capability an existing codebase doesn't have: the constraints, the repo's own patterns, verification against real feedback |
 
 On entering a phase, a hook emits one line naming the phase after it. That line
-is a suggestion; you type the next command, or you don't. Nothing in mate
-invokes the next phase on its own.
+is a suggestion; you type the next command, or you don't. The one step the agent
+takes for you is starting the work: after `/tack:start`, it picks `/mate:fix` or
+`/mate:feature` and runs it.
 
 ## Composes with
 
