@@ -17,6 +17,8 @@
 
 ### Fixed
 
+- The nudge works under macOS's built-in bash 3.2, where it printed nothing
+  for any phase.
 - The lines mate prints after a tool call now reach the agent: the step after
   `/anchor:commit`'s push, what a change request needs once it leaves draft,
   and the next phase when the agent (rather than you) invokes a skill. Each

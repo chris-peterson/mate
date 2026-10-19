@@ -51,7 +51,11 @@ skill=$(printf '%s' "$input" | jq -r '
 # `commit`, `merge` and `release` are generic enough that a stranger's skill
 # would draw a nudge about a pipeline it has nothing to do with, and each of
 # them is namespaced in every install that has it.
-msg=$(case "$skill" in
+#
+# The case sits in a function rather than inside `$( )`: macOS's /bin/bash is
+# 3.2, which misparses case patterns and heredoc apostrophes in a substitution.
+nudge_for() {
+case "$skill" in
   tack:start)
     url=$(printf '%s' "$input" | jq -r '(.prompt // "") | [scan("https://[^ )\n]+")] | .[0] // ""' 2>/dev/null || true)
     target=${url:-the linked issue}
@@ -110,7 +114,10 @@ MSG
     ;;
   *)
     ;;
-esac)
+esac
+}
+
+msg=$(nudge_for)
 
 [ -n "$msg" ] || exit 0
 
