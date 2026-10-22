@@ -50,7 +50,8 @@ session state.
 
 #### `HOOK-05`
 Every line mate prints shall name the next step and tell the agent not to run
-it, except the `TRACK` lines, which ask for the tack binding to be done.
+it, except the `TRACK` lines, which ask for the tack binding to be done, and
+the `session.started` line (`REACT-08`), which has the agent start the work.
 
 #### `HOOK-06`
 When a hook prints a line from a `PostToolUse` event, it shall print it as
@@ -68,16 +69,6 @@ When the agent invokes a skill, the nudge shall read the skill name from the
 When the user submits a prompt whose first line starts with `/<name>`, the nudge
 shall read the name from that token, and a command mentioned later in the
 prompt shall not match.
-
-#### `NUDGE-03`
-When `/tack:start` is entered, the nudge shall ask the agent to classify the
-linked work as a defect or a capability, name `/mate:fix` or `/mate:feature`,
-and invoke it for the same work; to stop when neither fits; and to carry on
-with the skill that opened the route when one did.
-
-#### `NUDGE-04`
-When `/tack:start` is entered with an `https` URL in the prompt, the nudge shall
-name that URL as the work being opened.
 
 #### `NUDGE-05`
 When `/mate:fix` or `/mate:feature` is entered, the nudge shall name
@@ -111,6 +102,9 @@ When `/anchor:backlog` is entered, the nudge shall ask the agent to end its
 reply by offering `/tack:start` with the recommended issue's URL, and to run
 nothing until the user picks.
 
+#### `NUDGE-14`
+When `/tack:start` is entered, the nudge shall print nothing.
+
 ### `REACT`
 Reactions to announcements
 
@@ -141,13 +135,24 @@ request still needs (a reviewer and the pipeline's state), once per session.
 #### `REACT-07`
 The react hook shall delete its one-shot markers after 7 days.
 
+#### `REACT-08`
+When tack announces `session.started` for the current session, or with no
+session field, the react hook shall ask the agent to classify the work as a
+defect or a capability and invoke `/mate:fix` or `/mate:feature` for it, naming
+the announced route; to start neither when neither fits; and to carry on when
+already in one. It shall do so once per session.
+
+#### `REACT-09`
+If a `session.started` body is not a JSON object, then the react hook shall
+neither mark the session nor print.
+
+
 ### `TRACK`
 Getting tack told about work already underway
 
 #### `TRACK-01`
 When tack announces `session.started` for the current session, or with no
-session field, the react hook shall mark the session as heard by tack and print
-nothing.
+session field, the react hook shall mark the session as heard by tack.
 
 #### `TRACK-02`
 When the agent first edits a file under the session's cwd in a git repo, while

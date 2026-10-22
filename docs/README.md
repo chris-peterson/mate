@@ -57,7 +57,8 @@ and only that half.
 Getting into the work is the agent's job, from either end. `/mate:fix 42`
 already says which work to open, so the skill runs `/tack:start` for it instead
 of asking you to type the same reference again. `/tack:start 42` already says
-you want the work started, so the nudge has the agent read the issue's labels
+you want the work started, so once tack binds the session to a route, mate has
+the agent read the issue's labels
 and description, say in one line which skill fits, and run it. Either way you
 come back to a session that is working, not one waiting on you.
 
@@ -86,9 +87,14 @@ call; only an agent-invoked skill produces one. mate registers on both events
 against the same script, so the line arrives whichever way the phase was
 entered.
 
-Two lines arrive by a different road. The suite's plugins announce what they
-caused on a command's stdout, and mate subscribes to the anchor keys that
-carry a fact a command name can never carry.
+Some lines arrive by a different road. The suite's plugins announce what they
+caused on a command's stdout, and mate subscribes to the keys that carry a fact
+a command name can never carry.
+
+`session.started` is tack saying it has bound this session to a route, which
+is the moment work opens, whether `/tack:start` did the binding or the agent did
+by hand. Its line has the agent classify the work and start `/mate:fix` or
+`/mate:feature`, once per session.
 
 `commit.pushed` carries the sha and the branch, and lands only once the push
 has. That matters because the nudge fires on *entering* a phase: when you type
@@ -126,9 +132,9 @@ has heard of the session. Until it arrives, two moments draw a line:
 
 Each line asks the agent to bind the session to the tack it drives (adding one
 when none fits), or to ask you about `/tack:start` when no route resolves. This
-is the one place mate asks for something to be done rather than named: binding
-is bookkeeping on the record the work already lives in, not a phase of the
-chain.
+is one of two places mate asks for something to be done rather than named:
+binding is bookkeeping on the record the work already lives in, not a phase of
+the chain. The other is starting the work tack just opened.
 
 ## Why "mate"
 

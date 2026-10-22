@@ -22,7 +22,7 @@ hooks:
   - event: PostToolUse
     matcher: Bash
     command: 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/react.sh"'
-    description: Names what a change request still needs once anchor reports the draft flag came off, and presses for a tack binding when a push lands before tack has heard of the session.
+    description: Starts the work tack just bound the session to, names what a change request still needs once anchor reports the draft flag came off, and presses for a tack binding when a push lands before tack has heard of the session.
   - event: PostToolUse
     matcher: Edit|Write|NotebookEdit
     command: 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/underway.sh"'

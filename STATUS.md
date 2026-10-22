@@ -3,19 +3,21 @@
 Tracking status of the requirements declared in [`SPEC.md`](SPEC.md).
 Maintained by `/sextant:spec-status`.
 
-**Last audit:** 2026-09-29
+**Last audit:** 2026-10-22
 **Spec version:** unversioned
-**Plugin version:** 0.1.0
-**Coverage:** 27 Covered, 2 Partial, 1 Missing/Contradicts
+**Plugin version:** 0.2.1
+**Coverage:** 40 Covered, 0 Partial, 1 Missing/Contradicts
 
 ## Status by category
 
 | Prefix | Count | Status | Notes |
 |--------|------:|--------|-------|
-| HOOK-01..05 | 5 | 4 Covered, 1 Contradicts | `hooks/nudge.sh`, `hooks/react.sh` (`announced`). HOOK-03: see Open / Needs Decision |
-| NUDGE-01..12 | 12 | 11 Covered, 1 Partial | `hooks/nudge.sh` (the `case` on `$skill`); `scripts/tests/nudge.test.sh`. NUDGE-04: the URL is read from `.prompt` only, so an agent-invoked `/tack:start` names "the linked issue" |
-| REACT-01..07 | 7 | All Covered | `hooks/react.sh` (`announced`, `claim`); `scripts/tests/react.test.sh` |
-| SKILL-01..06 | 6 | 5 Covered, 1 Partial | `skills/fix/SKILL.md`, `skills/feature/SKILL.md`. SKILL-02: only `guides/composing-with-siblings.md` says what replaces anchor, and neither skill names anchor or links the guide |
+| HOOK-01..06 | 6 | 5 Covered, 1 Contradicts | `hooks/nudge.sh`, `hooks/react.sh` (`announced`), `hooks/underway.sh`. HOOK-03: see Open / Needs Decision |
+| NUDGE-01..14 | 12 | All Covered | `hooks/nudge.sh` (`nudge_for`); `scripts/tests/nudge.test.sh`. No NUDGE-03 or NUDGE-04: the `/tack:start` line moved to REACT-08 |
+| REACT-01..09 | 9 | All Covered | `hooks/react.sh` (`announced`, `claim`); `scripts/tests/react.test.sh` |
+| SKILL-01..07 | 6 | All Covered | `skills/fix/SKILL.md`, `skills/feature/SKILL.md`. No SKILL-02 |
+| NEXT-01..03 | 3 | All Covered | `skills/next/SKILL.md` |
+| TRACK-01..06 | 5 | All Covered | `hooks/react.sh` (`tack_heard`), `hooks/underway.sh`; `scripts/tests/underway.test.sh`, `scripts/tests/react.test.sh`. No TRACK-05 |
 
 ## Open / Needs Decision
 
@@ -34,3 +36,9 @@ or **Contradicts** with a one-line note.
 Evidence pointers are the file plus its enclosing symbol by default. To use a
 different granularity, add `**Evidence pointers:** line` (or `anchor`, `file`,
 `directory`) to the metadata block above.
+
+## Audit history
+
+### 2026-10-22: Coverage refresh (spec-status)
+
+STATUS.md updated: 30 → 41 IDs (+HOOK-06, SKILL-07, NEXT-01..03, NUDGE-13..14, REACT-08..09, TRACK-01..04, TRACK-06; NUDGE-03..04 and SKILL-02 retired), 2 Partial → retired, version 0.1.0 → 0.2.1.

@@ -74,8 +74,9 @@ filled in. Say yes, or name another issue; nothing starts until you pick.
 
 ### `/tack:start`
 
-**Then:** mate asks the agent to read the linked issue's labels and description,
-decide whether it's a defect or a capability, say which skill fits, and run it:
+**Then:** once tack binds the session to the route, mate asks the agent to read
+the linked issue's labels and description, decide whether it's a defect or a
+capability, say which skill fits, and run it:
 
 - a defect whose cause isn't known yet → `/mate:fix`
 - a capability the codebase doesn't have → `/mate:feature`

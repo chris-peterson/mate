@@ -149,7 +149,7 @@ react_session() {
     '{session_id:$s,cwd:$c,tool_name:"Bash",tool_response:{stdout:$o}}' \
     | run_hook
 }
-check "session.started is silent" silent \
+check "session.started speaks" "invoke that skill" \
   "$(react_session 'codes.bridgeai.tack/session.started {"session":"sess-heard","route":"r"}' sess-heard)"
 check "a heard session isn't pressed" silent \
   "$(react_session "$(pushed feature-x)" sess-heard | grep -F 'tack session' || true)"
@@ -158,6 +158,30 @@ check "another session's bind doesn't count" "tack session" \
   "$(react_session "$(pushed feature-x)" sess-mine)"
 check "pressed once per session" silent \
   "$(react_session "$(pushed feature-x def5678)" sess-mine | grep -F 'tack session' || true)"
+
+echo ""
+echo "Starts the work tack opened, once per session:"
+STARTED='codes.bridgeai.tack/session.started {"route":"acme-widget"}'
+stdout_case "has the agent start it"   "invoke that skill"        "$STARTED"
+stdout_case "names both skills"        "/mate:feature"            "$STARTED"
+stdout_case "names the route"          'route `acme-widget`'      "$STARTED"
+stdout_case "no route field"           "bound this session to its route" \
+  'codes.bridgeai.tack/session.started {}'
+stdout_case "defers to a running skill" "If you are already"      "$STARTED"
+stdout_case "can decline"              "If neither fits"          "$STARTED"
+check "second bind is silent" silent \
+  "$(react_session 'codes.bridgeai.tack/session.started {"session":"sess-heard","route":"r"}' sess-heard)"
+check "another session's bind is silent" silent \
+  "$(react_session 'codes.bridgeai.tack/session.started {"session":"sess-x","route":"r"}' sess-y)"
+stdout_case "longer key"               silent \
+  'codes.bridgeai.tack/session.startedish {"route":"acme-widget"}'
+stdout_case "body that won't parse"    silent \
+  'codes.bridgeai.tack/session.started {"route":'
+stdout_case "body that isn't an object" silent \
+  'codes.bridgeai.tack/session.started 42'
+react_session 'codes.bridgeai.tack/session.started not-json' sess-garbled >/dev/null
+check "a garbled body doesn't mark the session" "tack session" \
+  "$(react_session "$(pushed feature-x)" sess-garbled)"
 
 echo ""
 echo "Names what the change request still needs:"
@@ -180,7 +204,6 @@ stdout_absent_case "no second merge line" "/anchor:merge" "$READY"
 echo ""
 echo "Silent on everything else:"
 stdout_case "a key mate doesn't take"  silent 'codes.bridgeai.anchor/cr.created {"uri":"https://github.com/o/r/pull/88"}'
-stdout_case "tack's own keys"          silent 'codes.bridgeai.tack/session.started {"route":"mate"}'
 stdout_case "longer key, same prefix"  silent 'codes.bridgeai.anchor/cr.readyish {"uri":"https://x/1"}'
 stdout_case "mid-line mention"         silent 'about to emit codes.bridgeai.anchor/cr.ready {"uri":"https://x/1"}'
 stdout_case "no announcement"          silent 'PUSHED=ok'

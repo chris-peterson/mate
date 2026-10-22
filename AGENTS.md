@@ -61,7 +61,7 @@ what picks the level.
   or ignores. A step that invokes the next phase on its own has rebuilt the
   sequencer this plugin exists to replace half of. The design note is in
   `docs/README.md`; it is the one constraint to hold when editing either skill
-  or the hook. Two exceptions. The `/tack:start` nudge has the agent invoke
+  or the hook. Two exceptions. The line on tack's `session.started` has the agent invoke
   `/mate:fix` or `/mate:feature`, because opening the envelope and starting
   the work are one request. The tack binding: `underway.sh` and `react.sh` ask
   for it to be done, because binding records work already underway and runs no

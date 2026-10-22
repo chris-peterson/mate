@@ -9,7 +9,9 @@
   and hooks always use them.
 - `/tack:start` now gets right to work: the agent decides whether the issue
   is a defect or a capability and runs `/mate:fix` or `/mate:feature` itself,
-  instead of naming it and waiting for you to type it.
+  instead of naming it and waiting for you to type it. The cue comes from tack
+  binding the session to a route, so it also arrives when the agent binds the
+  session by hand.
 
 ### Added
 

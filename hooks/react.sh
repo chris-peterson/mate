@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# The reaction: one line naming what comes next, keyed off what anchor announces
-# rather than off which skill the user ran.
+# The reaction: one line naming what comes next, keyed off what anchor and tack
+# announce rather than off which skill the user ran.
 #
 # The suite's plugins collaborate by printing one self-contained line on stdout,
 # which reaches this hook as `tool_response.stdout`:
@@ -13,8 +13,11 @@
 # Three keys are read, each for something a skill-name match cannot supply.
 #
 # `codes.bridgeai.tack/session.started` says tack has heard of this session,
-# which nothing else mate sees can establish. It prints nothing; it marks the
-# session so underway.sh and the push line below stop pressing for a binding.
+# which nothing else mate sees can establish. It marks the session so
+# underway.sh and the push line below stop pressing for a binding, and it is
+# the moment work opens on a route, so its line has the agent classify that
+# work and start it. That is the one line here that invokes rather than names,
+# because opening the envelope is asking for the work inside it.
 #
 # `commit.pushed` carries the sha and the branch, and it is announced only once
 # the push has landed — which is downstream of `/anchor:commit`'s own review of
@@ -30,8 +33,9 @@
 # cr.created, cr.updated, cr.merged, issue.created and release.created on the
 # route.
 #
-# Matching what anchor says rather than the shape of the command it ran is what
-# lets anchor change forge CLIs without silently taking these lines out.
+# Matching what a sibling says rather than the shape of the command it ran is
+# what lets anchor change forge CLIs, or tack reshape its skill, without silently
+# taking these lines out.
 #
 # A PostToolUse hook's plain stdout reaches the transcript and never the agent,
 # so the lines are collected and handed over once, as additionalContext. Every
@@ -80,12 +84,30 @@ claim() {
 }
 
 # The announcement is for the session that ran the command, so a body naming a
-# different one is a bind made on someone else's behalf.
+# different one is a bind made on someone else's behalf. A body that isn't a
+# JSON object isn't tack's announcement, so it neither marks nor speaks.
 body=$(announced 'tack/session\.started')
-if [ -n "$body" ]; then
-  for_session=$(printf '%s' "$body" | jq -r '.session // empty' 2>/dev/null || true)
+if [ -n "$body" ] \
+  && for_session=$(printf '%s' "$body" | jq -er '.session // ""' 2>/dev/null); then
   if [ -z "$for_session" ] || [ "$for_session" = "$session_id" ]; then
-    claim tack-heard "$session_id" || true
+    if claim tack-heard "$session_id"; then
+      route=$(printf '%s' "$body" | jq -r '.route // empty' 2>/dev/null || true)
+      if [ -n "$route" ]; then where="route \`$route\`"; else where="its route"; fi
+      say <<MSG
+mate: tack has bound this session to ${where}. Once the envelope is open,
+classify the work yourself (read the labels and the description: a defect whose
+cause isn't known yet, or a capability) and start it:
+
+  /mate:fix      a defect: root-cause it, prove the fix against something that
+                 failed before it, sweep the bug class
+  /mate:feature  a capability: gather the constraints, mirror the repo's
+                 patterns, verify each against real feedback
+
+Say which and why in one sentence, then invoke that skill for the same work and
+carry on with it. If neither fits, say so and start neither. If you are already
+in /mate:fix or /mate:feature, carry on.
+MSG
+    fi
   fi
 fi
 

@@ -3,8 +3,8 @@
 #
 # mate replaces the forward pressure a retired sequencer used to carry, and only
 # that half — the line says what comes next and stops there. The user types the
-# next command, or doesn't. `/tack:start` is the exception: opening the envelope
-# is asking for the work inside it, so its line has the agent start that work.
+# next command, or doesn't. Opening the envelope is the exception, and react.sh
+# carries it, on tack's `session.started` rather than on the name of tack's skill.
 #
 # A skill invocation arrives in two shapes and this reads both:
 #   - the agent invokes it -> PostToolUse, tool_name "Skill", name in
@@ -64,24 +64,6 @@ the pick's URL filled in:
   /tack:start <issue-url>
 
 Ask which one to start; don't run it until the user picks.
-MSG
-    ;;
-  tack:start)
-    url=$(printf '%s' "$input" | jq -r '(.prompt // "") | [scan("https://[^ )\n]+")] | .[0] // ""' 2>/dev/null || true)
-    target=${url:-the linked issue}
-    cat <<MSG
-mate: this session is opening work on ${target}. Once the envelope is open,
-classify the work yourself (read the labels and the description: a defect whose
-cause isn't known yet, or a capability) and start it:
-
-  /mate:fix      a defect: root-cause it, prove the fix against something that
-                 failed before it, sweep the bug class
-  /mate:feature  a capability: gather the constraints, mirror the repo's
-                 patterns, verify each against real feedback
-
-Say which and why in one sentence, then invoke that skill for the same work and
-carry on with it. If neither fits, say so and stop. If /mate:fix or
-/mate:feature opened this route, you are already in it: carry on.
 MSG
     ;;
   mate:fix|fix|mate:feature|feature)

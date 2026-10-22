@@ -18,7 +18,7 @@ An empty list ends the skill: say so, and offer to widen the scope rather than s
 
 ## Offer, then wait
 
-End the reply by offering `/tack:start <issue-url>` for the pick, with its URL filled in. mate's nudge on `/tack:start` classifies the work and runs `/mate:fix` or `/mate:feature`.
+End the reply by offering `/tack:start <issue-url>` for the pick, with its URL filled in. mate's line on tack's `session.started`, which `/tack:start` draws, classifies the work and runs `/mate:fix` or `/mate:feature`.
 
 Ask whether to start that one or another, and run nothing until the user picks. Starting cuts a branch and opens a route, and the survey only answered "what's next?", so the choice stays the user's. When the user names a different issue, offer the same command for that one.
 

@@ -28,8 +28,9 @@ one moment the URL to hand over exists. Neither runs anything.
 The link between the envelope and the skill is the one the agent crosses on its
 own, in either direction. `/mate:feature 42` already names the work, so the
 skill invokes `/tack:start` for it rather than asking for the same reference a
-second time. `/tack:start 42` already asks for the work, so the nudge has the
-agent classify it and invoke `/mate:fix` or `/mate:feature`. Opening the
+second time. `/tack:start 42` already asks for the work, so when tack announces
+`session.started` for the session it just bound, `react.sh` has the agent
+classify the work and invoke `/mate:fix` or `/mate:feature`. Opening the
 envelope and starting the work are one request; every link after the skill
 stays a line the user acts on or ignores.
 
