@@ -5,8 +5,9 @@ announce and names what should run next. Today that is a nudge layer over the
 skills where the code actually changes, naming the phase you are about to
 enter next without running it for you.
 
-`/mate:fix` drives a bug from symptom to shipped fix. `/mate:feature` adds
-capability to a working codebase. `hooks/nudge.sh` emits one line, on entering
+`/mate:next` picks the work and offers to start it. `/mate:fix` drives a bug
+from symptom to shipped fix. `/mate:feature` adds capability to a working
+codebase. `hooks/nudge.sh` emits one line, on entering
 a phase, naming the phase after it. `hooks/underway.sh` and `hooks/react.sh`
 press for the session to be bound to a tack once work is underway, until tack
 announces it has heard of the session.
@@ -28,6 +29,7 @@ hooks/hooks.yml         source of record for the hook registrations
 hooks/nudge.sh          the nudge — resolves a skill name from both shapes
 hooks/react.sh          the reaction — reads the subscribed keys off a sibling's stdout
 hooks/underway.sh       presses for a tack binding on the first edit in the repo
+skills/next/            the skill that picks the work and offers to start it
 skills/fix/             the defect skill and its reference files
 skills/feature/         the capability skill and its reference files
 guides/                 the composition contract with tack and anchor

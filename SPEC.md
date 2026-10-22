@@ -21,9 +21,9 @@ below its category's heading, so every requirement has a linkable anchor
   `/name` when the user types it (`UserPromptSubmit`).
 - **Announcement**: one line a sibling plugin prints on a command's stdout,
   `codes.bridgeai.<plugin>/<key> {json}`, per the suite's interop contract.
-- **The chain**: `/tack:start` → `/mate:fix` or `/mate:feature` →
-  `/anchor:commit` → `/anchor:prepare-review` → `/anchor:review` →
-  `/anchor:merge` → `/anchor:release` → `/tack:end`.
+- **The chain**: `/mate:next` → `/tack:start` → `/mate:fix` or
+  `/mate:feature` → `/anchor:commit` → `/anchor:prepare-review` →
+  `/anchor:review` → `/anchor:merge` → `/anchor:release` → `/tack:end`.
 - **The envelope**: what `/tack:start` opens and `/tack:end` closes: the linked
   thread read in full, a slug, a branch, and the tack route.
 - **Soft degrade**: a step that names a sibling's command when the sibling is
@@ -107,6 +107,12 @@ When `/anchor:commit` is entered, the nudge shall print nothing.
 #### `NUDGE-12`
 The nudge shall match bare skill names only for `code-review`, `fix`, and
 `feature`.
+
+#### `NUDGE-13`
+When `/anchor:backlog` is entered, the nudge shall ask the agent to end its
+reply by offering `/tack:start` with the recommended issue's URL, or
+`/mate:fix` or `/mate:feature` with it where tack isn't installed, and to run
+nothing until the user picks.
 
 ### `REACT`
 Reactions to announcements
@@ -197,3 +203,23 @@ Each skill shall name the next phase in its wrap-up rather than invoke it.
 When the check that proves a fix is a run that already existed, `/mate:fix`
 shall report it as that run failing and then passing, without the RED and GREEN
 labels.
+
+### `NEXT`
+The next skill
+
+#### `NEXT-01`
+Where anchor is installed, `/mate:next` shall survey the work through
+`/anchor:backlog` and keep its ranking.
+
+#### `NEXT-02`
+Where anchor is absent, `/mate:next` shall list the open issues assigned to the
+user through the forge CLI, ranked by due date and then by most recent update.
+
+#### `NEXT-03`
+`/mate:next` shall end by offering `/tack:start` with the top pick's URL, or
+`/mate:fix` or `/mate:feature` with it where tack is absent, and shall start
+nothing until the user picks.
+
+#### `NEXT-04`
+If the survey finds no issues, then `/mate:next` shall say so and offer to widen
+the scope, starting nothing.

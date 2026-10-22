@@ -29,16 +29,18 @@ claude plugin install mate@chris-peterson
 
 ## The skills
 
-| | `/mate:fix` | `/mate:feature` |
-|---|---|---|
-| For | a defect whose cause isn't known yet | a capability an existing codebase doesn't have |
-| Triggers on | a stack trace, a CI failure, "works locally but fails in CI" | "add X", a feature request, a spec |
-| The spine | root cause → RED → GREEN → verify → sweep the bug class | constraints → first working implementation → refine against real feedback → consolidate |
-| Skip it when | the correction is already known and mechanical, or there's no error signal to reason from | the work is a defect, the project is greenfield, or the deliverable is an answer rather than code |
+| | `/mate:next` | `/mate:fix` | `/mate:feature` |
+|---|---|---|---|
+| For | choosing what to work on | a defect whose cause isn't known yet | a capability an existing codebase doesn't have |
+| Triggers on | "what's next?", "what should I work on?" | a stack trace, a CI failure, "works locally but fails in CI" | "add X", a feature request, a spec |
+| The spine | survey → recommend → offer `/tack:start` → wait for your pick | root cause → RED → GREEN → verify → sweep the bug class | constraints → first working implementation → refine against real feedback → consolidate |
+| Skip it when | you've already named the work | the correction is already known and mechanical, or there's no error signal to reason from | the work is a defect, the project is greenfield, or the deliverable is an answer rather than code |
 
-Both carry reference files the skill loads only when it needs them: the symptom
-catalog and the diagnostic techniques for `fix`, the verification instruments
-and the accumulated patterns catalog for `feature`.
+`/mate:next` surveys through `/anchor:backlog` where anchor is installed, and
+lists your assigned issues itself where it isn't. `fix` and `feature` carry
+reference files the skill loads only when it needs them: the symptom catalog
+and the diagnostic techniques for `fix`, the verification instruments and the
+accumulated patterns catalog for `feature`.
 
 ## Nudge, never sequence
 
@@ -69,11 +71,11 @@ mate: when this phase is done and the tree is green, the next step is
 
 ## The chain it names
 
-`/tack:start` → **`/mate:fix`** or **`/mate:feature`** → `/anchor:commit` →
-`/anchor:prepare-review` → `/anchor:review` → `/anchor:merge` →
-`/anchor:release` → `/tack:end`
+**`/mate:next`** → `/tack:start` → **`/mate:fix`** or **`/mate:feature`** →
+`/anchor:commit` → `/anchor:prepare-review` → `/anchor:review` →
+`/anchor:merge` → `/anchor:release` → `/tack:end`
 
-mate supplies the two in bold. [tack](https://github.com/chris-peterson/tack)
+mate supplies the three in bold. [tack](https://github.com/chris-peterson/tack)
 and [anchor](https://github.com/chris-peterson/anchor) supply the rest, and both
 are optional: a bare `mate` install runs both skills start to finish, and each
 step that names a sibling says what to do when it isn't there. The full

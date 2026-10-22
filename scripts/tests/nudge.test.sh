@@ -54,6 +54,7 @@ echo "=== nudge tests ==="
 
 echo ""
 echo "Names the next phase when the agent invokes a phase skill:"
+skill_case "backlog -> start"             "/tack:start <issue-url>" "anchor:backlog"
 skill_case "tack:start classifies"        "/mate:fix"              "tack:start"
 skill_case "fix -> commit"                "/anchor:commit"         "mate:fix"
 skill_case "feature -> commit"            "/anchor:commit"         "mate:feature"
@@ -65,6 +66,8 @@ skill_case "release -> close"             "/tack:end"              "anchor:relea
 
 echo ""
 echo "Names the next phase when the user types it:"
+prompt_case "typed backlog"               "/tack:start <issue-url>" "/anchor:backlog"
+prompt_case "typed backlog with a query"  "/tack:start <issue-url>" "/anchor:backlog anything due soon?"
 prompt_case "typed tack:start"            "/mate:fix"              "/tack:start"
 prompt_case "typed with a url"            "issues/42"              "/tack:start https://github.com/o/r/issues/42"
 prompt_case "typed mate:fix"              "/anchor:commit"         "/mate:fix"
@@ -87,6 +90,8 @@ rm -f "$trace"
 echo ""
 echo "Never sequences — every nudge says not to run the next step:"
 skill_case "fix nudge is hands-off"       "don't run it" "mate:fix"
+skill_case "backlog waits for the pick"   "don't run it until the user picks" "anchor:backlog"
+skill_case "backlog degrades without tack" "/mate:feature <issue-url>"       "anchor:backlog"
 
 echo ""
 echo "Starts the work /tack:start opened, unless a mate skill opened it:"
@@ -111,6 +116,7 @@ prompt_case "mid-sentence mention"        silent "remind me to run /mate:fix lat
 prompt_case "longer name, same prefix"    silent "/fixtures"
 prompt_case "generic bare start"          silent "/start"
 prompt_case "generic bare release"        silent "/release"
+prompt_case "generic bare backlog"        silent "/backlog"
 prompt_case "plain prose"                 silent "why is the build red"
 prompt_case "empty prompt"                silent ""
 

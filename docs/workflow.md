@@ -12,6 +12,8 @@ one-shot marker that stops an announcement from being answered twice.
 ```mermaid
 %%{ init: { 'look': 'handDrawn' } }%%
 flowchart TD
+    next["/mate:next"] --> backlog["/anchor:backlog"]
+    backlog -->|you pick an issue| start
     start["/tack:start &lt;issue&gt;"] -->|defect| fix["/mate:fix"]
     start -->|capability| feature["/mate:feature"]
     fix --> commit["/anchor:commit"]
@@ -49,6 +51,7 @@ equally strong:
 | `/anchor:prepare-review` → `/anchor:review` | <span style="white-space: nowrap"><span aria-hidden="true">●●○</span> Announced, not read</span> | anchor's `cr.created` |
 | `/anchor:merge` → `/anchor:release` | <span style="white-space: nowrap"><span aria-hidden="true">●●○</span> Announced, not read</span> | anchor's `cr.merged` |
 | `/anchor:release` → `/tack:end` | <span style="white-space: nowrap"><span aria-hidden="true">●●○</span> Announced, not read</span> | anchor's `release.created` |
+| `/mate:next` or `/anchor:backlog` → `/tack:start` | <span style="white-space: nowrap"><span aria-hidden="true">●○○</span> The agent's judgment</span> | the agent offers the issue backlog ranked first; you pick it or another |
 | `/tack:start` → `/mate:fix` or `/mate:feature` | <span style="white-space: nowrap"><span aria-hidden="true">●○○</span> The agent's judgment</span> | the agent reads the issue's labels and description |
 | `/mate:fix` or `/mate:feature` → `/anchor:commit` | <span style="white-space: nowrap"><span aria-hidden="true">●○○</span> The agent's judgment</span> | the agent decides the tree is green; `/anchor:commit` runs the tests again before it commits |
 | `/code-review` → `/anchor:prepare-review` | <span style="white-space: nowrap"><span aria-hidden="true">●○○</span> The agent's judgment</span> | the agent decides the findings are settled |
@@ -62,6 +65,13 @@ condition, so it reads as advice for later rather than an instruction now.
 
 These fire the moment you type the command, or the agent invokes the skill.
 The line says what to run once the phase is done.
+
+### `/anchor:backlog`
+
+**Then:** `/tack:start` on the issue backlog ranks first, offered with its URL
+filled in. Say yes, or name another issue; nothing starts until you pick.
+Without tack, the offer is `/mate:fix` or `/mate:feature` for that issue
+instead. `/mate:next` runs `/anchor:backlog` for you, so this line covers both.
 
 ### `/tack:start`
 

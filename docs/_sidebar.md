@@ -1,6 +1,7 @@
 - [Home](/)
 - [Workflow](/workflow)
 - Skills
+  - [next](/skills/next)
   - [fix](/skills/fix)
   - [feature](/skills/feature)
 - [Hooks](/hooks)

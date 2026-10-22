@@ -69,7 +69,7 @@ suite:
       reason: opens the envelope each skill starts from and closes it at the end
     - name: anchor
       required: false
-      reason: supplies the commit, change-request, merge, and release phases the nudge names
+      reason: supplies the backlog, commit, change-request, merge, and release phases the nudge names
   # Two user-invoked skills, plus hooks that read both shapes a skill
   # invocation arrives in. Nothing at session start.
   activations: [agent, user]
@@ -81,6 +81,7 @@ suite:
     skills:
       feature: Add a capability to an existing codebase — gather the constraints that prevent false starts, implement one feature at a time against the repo's existing patterns, verify each against real feedback, then consolidate before merge.
       fix: Diagnose a bug whose cause isn't known yet — root-cause it, prove the fix against something that failed before it (a new test, or the CI run that already did), then sweep for the same bug class.
+      next: Pick the next piece of work and put it one confirmation away from started.
     hooks:
       hooks: 'Hook wiring: PostToolUse→nudge (Skill), react (Bash), underway (Edit|Write|NotebookEdit); UserPromptSubmit→nudge.'
       nudge: PostToolUse / UserPromptSubmit — Names the phase that follows the one just entered, as one line the user acts on or ignores.

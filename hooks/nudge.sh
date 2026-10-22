@@ -56,6 +56,18 @@ skill=$(printf '%s' "$input" | jq -r '
 # 3.2, which misparses case patterns and heredoc apostrophes in a substitution.
 nudge_for() {
 case "$skill" in
+  anchor:backlog)
+    cat <<'MSG'
+mate: once you name the next pick, end the reply by offering to start it, with
+the pick's URL filled in:
+
+  /tack:start <issue-url>
+
+Without tack installed, offer `/mate:fix <issue-url>` or
+`/mate:feature <issue-url>` instead, whichever the issue's labels and
+description fit. Ask which one to start; don't run it until the user picks.
+MSG
+    ;;
   tack:start)
     url=$(printf '%s' "$input" | jq -r '(.prompt // "") | [scan("https://[^ )\n]+")] | .[0] // ""' 2>/dev/null || true)
     target=${url:-the linked issue}

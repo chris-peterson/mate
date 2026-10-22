@@ -8,9 +8,10 @@ This is the map of who supplies what, and what to do when they aren't there.
 
 | Phase | Command | Supplied by |
 |---|---|---|
+| Pick the work | `/mate:next`, which runs `/anchor:backlog` | mate, with [anchor](https://github.com/chris-peterson/anchor) |
 | Open the envelope | `/tack:start [url]` | [tack](https://github.com/chris-peterson/tack) |
 | Make the change | `/mate:fix`, `/mate:feature` | mate |
-| Commit and push | `/anchor:commit` | [anchor](https://github.com/chris-peterson/anchor) |
+| Commit and push | `/anchor:commit` | anchor |
 | Open the change request | `/anchor:prepare-review` | anchor |
 | Self-review it | `/anchor:review` | anchor |
 | Merge | `/anchor:merge` | anchor |
@@ -61,6 +62,9 @@ decided the shape for a feature — and open the change request as a draft. What
 anchor supplies beyond the mechanics is the drafting discipline and the review
 guide; a hand-rolled `gh pr create --body` lands the change request non-draft
 with the project template's checklist intact, so at minimum mark it draft.
+The survey at the head of the chain is a forge query too: `/mate:next` lists
+the open issues assigned to you itself, ranked the way `/anchor:backlog` ranks
+them.
 
 Two things go with it. The commit's review gate is one: read the pending
 changeset yourself, file by file, before committing — `/code-review` over the
