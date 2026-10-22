@@ -91,7 +91,6 @@ echo ""
 echo "Never sequences — every nudge says not to run the next step:"
 skill_case "fix nudge is hands-off"       "don't run it" "mate:fix"
 skill_case "backlog waits for the pick"   "don't run it until the user picks" "anchor:backlog"
-skill_case "backlog degrades without tack" "/mate:feature <issue-url>"       "anchor:backlog"
 
 echo ""
 echo "Starts the work /tack:start opened, unless a mate skill opened it:"

@@ -26,8 +26,6 @@ below its category's heading, so every requirement has a linkable anchor
   `/anchor:review` → `/anchor:merge` → `/anchor:release` → `/tack:end`.
 - **The envelope**: what `/tack:start` opens and `/tack:end` closes: the linked
   thread read in full, a slug, a branch, and the tack route.
-- **Soft degrade**: a step that names a sibling's command when the sibling is
-  installed and says what to do instead when it is not, in the same sentence.
 
 ## Requirements
 
@@ -110,8 +108,7 @@ The nudge shall match bare skill names only for `code-review`, `fix`, and
 
 #### `NUDGE-13`
 When `/anchor:backlog` is entered, the nudge shall ask the agent to end its
-reply by offering `/tack:start` with the recommended issue's URL, or
-`/mate:fix` or `/mate:feature` with it where tack isn't installed, and to run
+reply by offering `/tack:start` with the recommended issue's URL, and to run
 nothing until the user picks.
 
 ### `REACT`
@@ -166,9 +163,6 @@ tack, whatever the branch.
 #### `TRACK-04`
 Each `TRACK` line shall be printed at most once per session per hook.
 
-#### `TRACK-05`
-If the tack CLI isn't on `PATH`, then neither hook shall print a `TRACK` line.
-
 #### `TRACK-06`
 If the edited file lies outside the session's cwd, or the cwd isn't in a git
 repo, then the underway hook shall print nothing and leave its once-per-session
@@ -178,13 +172,8 @@ line unspent.
 The fix and feature skills
 
 #### `SKILL-01`
-Where tack is installed and no route resolves, each skill shall invoke
-`/tack:start` with the work the user named and continue; where tack is absent,
-the skill shall do the envelope by hand.
-
-#### `SKILL-02`
-Where anchor is absent, the skills shall say what replaces the commit, change
-request, merge, and release phases.
+When no route resolves, each skill shall invoke `/tack:start` with the work the
+user named and continue.
 
 #### `SKILL-03`
 `/mate:fix` shall prove the fix with a check that fails before it and passes
@@ -208,18 +197,13 @@ labels.
 The next skill
 
 #### `NEXT-01`
-Where anchor is installed, `/mate:next` shall survey the work through
-`/anchor:backlog` and keep its ranking.
+`/mate:next` shall survey the work through `/anchor:backlog` and keep its
+ranking.
 
 #### `NEXT-02`
-Where anchor is absent, `/mate:next` shall list the open issues assigned to the
-user through the forge CLI, ranked by due date and then by most recent update.
+`/mate:next` shall end by offering `/tack:start` with the top pick's URL, and
+shall start nothing until the user picks.
 
 #### `NEXT-03`
-`/mate:next` shall end by offering `/tack:start` with the top pick's URL, or
-`/mate:fix` or `/mate:feature` with it where tack is absent, and shall start
-nothing until the user picks.
-
-#### `NEXT-04`
 If the survey finds no issues, then `/mate:next` shall say so and offer to widen
 the scope, starting nothing.

@@ -4,6 +4,9 @@
 
 ### Changed
 
+- Installing mate installs anchor and tack with it. mate joins the phases
+  those two supply, so it now declares both as dependencies, and the skills
+  and hooks always use them.
 - `/tack:start` now gets right to work: the agent decides whether the issue
   is a defect or a capability and runs `/mate:fix` or `/mate:feature` itself,
   instead of naming it and waiting for you to type it.
@@ -11,14 +14,14 @@
 ### Added
 
 - `/mate:next` picks your next piece of work: it surveys the issues assigned
-  to you (through `/anchor:backlog` when anchor is installed), recommends the
-  top one, and offers `/tack:start` with its URL filled in. It starts that
-  issue, or another one, once you say which. Typing `/anchor:backlog` yourself
-  ends with the same offer.
+  to you through `/anchor:backlog`, recommends the top one, and offers
+  `/tack:start` with its URL filled in. It starts that issue, or another one,
+  once you say which. Typing `/anchor:backlog` yourself ends with the same
+  offer.
 - Work that didn't start from `/tack:start`, `/mate:fix` or `/mate:feature`
   still gets recorded on tack: the first edit inside the repo, and the first
   push, each ask the agent to bind the session to a tack until tack reports it
-  has heard of the session. With no tack CLI installed, nothing changes.
+  has heard of the session.
 
 ### Fixed
 

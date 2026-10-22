@@ -63,9 +63,7 @@ the pick's URL filled in:
 
   /tack:start <issue-url>
 
-Without tack installed, offer `/mate:fix <issue-url>` or
-`/mate:feature <issue-url>` instead, whichever the issue's labels and
-description fit. Ask which one to start; don't run it until the user picks.
+Ask which one to start; don't run it until the user picks.
 MSG
     ;;
   tack:start)

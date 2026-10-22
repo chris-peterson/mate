@@ -111,10 +111,9 @@ what picks the level.
   The tests decode that JSON and fail on anything else. Either way, what lands
   is context whether or not it is useful there, so every non-matching path
   prints nothing.
-- **The siblings are optional and the skills say so at each site.** tack and
-  anchor each supply phases; `guides/composing-with-siblings.md` carries what
-  replaces each one when it is absent. A skill step that assumes a sibling is
-  installed is a bug.
+- **anchor and tack are dependencies.** `plugin.yml` declares both, so Claude
+  Code installs them with mate, and a skill or hook can name their commands
+  and read their announcements without a branch for their absence.
 
 ## Glossary
 
@@ -123,8 +122,6 @@ what picks the level.
 - **The envelope** — what `/tack:start` opens and `/tack:end` closes: the linked
   thread read in full, a slug, a branch, and the route the deliverable is
   recorded against.
-- **Soft degrade** — a step that names a sibling's command when the sibling is
-  present and says what to do instead when it is not, in the same sentence.
 - **Both shapes** — the two ways a skill invocation reaches a hook: a `Skill`
   tool call when the agent invokes it, and a prompt heading with `/name` when
   the user types it.

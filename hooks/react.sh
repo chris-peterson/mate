@@ -130,8 +130,7 @@ MSG
   # A pushed commit is the work's first durable artifact, so a session tack
   # still hasn't heard of is pressed once more here, whatever underway.sh said
   # at the first edit. Unlike the line above, it needs no default branch.
-  if [ -n "$sha" ] && ! tack_heard && command -v tack >/dev/null 2>&1 \
-    && claim tack-pushed "$session_id"; then
+  if [ -n "$sha" ] && ! tack_heard && claim tack-pushed "$session_id"; then
     say <<MSG
 mate: tack still hasn't heard which work ${sha} belongs to. Bind the session now
 so what lands is recorded: \`tack session <slug> ${session_id} --tack <id>\`,

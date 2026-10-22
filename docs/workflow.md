@@ -70,8 +70,7 @@ The line says what to run once the phase is done.
 
 **Then:** `/tack:start` on the issue backlog ranks first, offered with its URL
 filled in. Say yes, or name another issue; nothing starts until you pick.
-Without tack, the offer is `/mate:fix` or `/mate:feature` for that issue
-instead. `/mate:next` runs `/anchor:backlog` for you, so this line covers both.
+`/mate:next` runs `/anchor:backlog` for you, so this line covers both.
 
 ### `/tack:start`
 

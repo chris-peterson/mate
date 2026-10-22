@@ -36,8 +36,7 @@ claude plugin install mate@chris-peterson
 | The spine | survey → recommend → offer `/tack:start` → wait for your pick | root cause → RED → GREEN → verify → sweep the bug class | constraints → first working implementation → refine against real feedback → consolidate |
 | Skip it when | you've already named the work | the correction is already known and mechanical, or there's no error signal to reason from | the work is a defect, the project is greenfield, or the deliverable is an answer rather than code |
 
-`/mate:next` surveys through `/anchor:backlog` where anchor is installed, and
-lists your assigned issues itself where it isn't. `fix` and `feature` carry
+`/mate:next` surveys through `/anchor:backlog`. `fix` and `feature` carry
 reference files the skill loads only when it needs them: the symptom catalog
 and the diagnostic techniques for `fix`, the verification instruments and the
 accumulated patterns catalog for `feature`.
@@ -76,10 +75,9 @@ mate: when this phase is done and the tree is green, the next step is
 `/anchor:merge` → `/anchor:release` → `/tack:end`
 
 mate supplies the three in bold. [tack](https://github.com/chris-peterson/tack)
-and [anchor](https://github.com/chris-peterson/anchor) supply the rest, and both
-are optional: a bare `mate` install runs both skills start to finish, and each
-step that names a sibling says what to do when it isn't there. The full
-contract is in [Composing with the siblings](/guides/composing-with-siblings).
+and [anchor](https://github.com/chris-peterson/anchor) supply the rest, and
+installing mate installs both. The full contract is in
+[Composing with the siblings](/guides/composing-with-siblings).
 
 ## How the nudge reaches you
 
@@ -130,7 +128,7 @@ Each line asks the agent to bind the session to the tack it drives (adding one
 when none fits), or to ask you about `/tack:start` when no route resolves. This
 is the one place mate asks for something to be done rather than named: binding
 is bookkeeping on the record the work already lives in, not a phase of the
-chain. With no tack CLI installed, neither line appears.
+chain.
 
 ## Why "mate"
 

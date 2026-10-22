@@ -17,21 +17,12 @@ TMPROOT="$(mktemp -d)"
 trap 'rm -rf "$TMPROOT"' EXIT
 SESSION_SEQ=0
 
-# Whether the tack CLI is on PATH changes what a push says, so the hook runs on
-# a PATH built from jq and git alone, and the tack cases put a stub in front.
-NOTACK_PATH="$(dirname "$(command -v jq)"):$(dirname "$(command -v git)"):/usr/bin:/bin"
-TACK_STUB="$TMPROOT/stub"
-mkdir -p "$TACK_STUB"
-printf '#!/bin/sh\nexit 0\n' > "$TACK_STUB/tack"
-chmod +x "$TACK_STUB/tack"
-HOOK_PATH="$NOTACK_PATH"
-
 # The hook answers in PostToolUse's JSON, so a case reads the text the agent
 # receives. Output that isn't that JSON comes back marked, so it can't pass as
 # silence or as a match.
 run_hook() {
   local raw
-  raw=$(TMPDIR="$TMPROOT" PATH="$HOOK_PATH" bash "$HOOK" 2>/dev/null || true)
+  raw=$(TMPDIR="$TMPROOT" bash "$HOOK" 2>/dev/null || true)
   [ -n "$raw" ] || return 0
   printf '%s' "$raw" \
     | jq -er 'select(.hookSpecificOutput.hookEventName == "PostToolUse") | .hookSpecificOutput.additionalContext' 2>/dev/null \
@@ -88,7 +79,7 @@ stdout_case() {
 # means the line never said it.
 stdout_absent_case() {
   SESSION_SEQ=$((SESSION_SEQ + 1))
-  check "$1" silent "$(announced "$3" "sess-$SESSION_SEQ" "$REPO" | grep -F -- "$2" || true)"
+  check "$1" silent "$(announced "$3" "sess-$SESSION_SEQ" "${4:-$REPO}" | grep -F -- "$2" || true)"
 }
 
 # One commit.pushed announcement, in the shape anchor's scripts/commit.sh emits.
@@ -123,9 +114,10 @@ stdout_absent_case "no CR to open"     "/anchor:prepare-review"  "$(pushed main)
 stdout_case "says why there is none"   "no change request to open" "$(pushed main)"
 
 echo ""
-echo "Silent where the branch can't be placed against a default:"
-stdout_case "no origin/HEAD"           silent "$(pushed feature-x)" "$NOHEAD"
-stdout_case "no branch field"          silent \
+echo "Names no next step where the branch can't be placed against a default:"
+# The tack binding press still fires on these, since it needs only the sha.
+stdout_absent_case "no origin/HEAD"    "/anchor:" "$(pushed feature-x)" "$NOHEAD"
+stdout_absent_case "no branch field"   "/anchor:" \
   'codes.bridgeai.anchor/commit.pushed {"sha":"abc1234"}'
 stdout_case "no sha field"             silent \
   'codes.bridgeai.anchor/commit.pushed {"branch":"feature-x"}'
@@ -144,7 +136,6 @@ check "an amend speaks"    "def5678" "$(react_as "$(pushed feature-x def5678)")"
 
 echo ""
 echo "Presses for a tack binding on a push tack hasn't heard of:"
-HOOK_PATH="$TACK_STUB:$NOTACK_PATH"
 stdout_case "names the binding"        "tack session <slug> sess-"  "$(pushed feature-x)"
 stdout_case "carries the sha"          "which work abc1234"         "$(pushed feature-x)"
 stdout_case "offers /tack:start"       "/tack:start"                "$(pushed feature-x)"
@@ -167,9 +158,6 @@ check "another session's bind doesn't count" "tack session" \
   "$(react_session "$(pushed feature-x)" sess-mine)"
 check "pressed once per session" silent \
   "$(react_session "$(pushed feature-x def5678)" sess-mine | grep -F 'tack session' || true)"
-HOOK_PATH="$NOTACK_PATH"
-
-stdout_absent_case "no tack CLI, no press" "tack session"       "$(pushed feature-x)"
 
 echo ""
 echo "Names what the change request still needs:"

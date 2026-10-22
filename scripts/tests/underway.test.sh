@@ -33,16 +33,6 @@ check() {
   esac
 }
 
-# Whether the tack CLI is on PATH decides whether there is anyone to tell, so
-# the hook runs on a PATH built from jq and git alone, with a stub in front for
-# the cases where tack is installed.
-NOTACK_PATH="$(dirname "$(command -v jq)"):$(dirname "$(command -v git)"):/usr/bin:/bin"
-TACK_STUB="$TMPROOT/stub"
-mkdir -p "$TACK_STUB"
-printf '#!/bin/sh\nexit 0\n' > "$TACK_STUB/tack"
-chmod +x "$TACK_STUB/tack"
-HOOK_PATH="$TACK_STUB:$NOTACK_PATH"
-
 REPO="$TMPROOT/widget"
 PLAIN="$TMPROOT/plain"
 mkdir -p "$REPO/src" "$PLAIN"
@@ -63,7 +53,7 @@ edit() {
 # silence or as a match.
 run_hook() {
   local raw
-  raw=$(TMPDIR="$TMPROOT" PATH="$HOOK_PATH" bash "$HOOK" 2>/dev/null || true)
+  raw=$(TMPDIR="$TMPROOT" bash "$HOOK" 2>/dev/null || true)
   [ -n "$raw" ] || return 0
   printf '%s' "$raw" \
     | jq -er 'select(.hookSpecificOutput.hookEventName == "PostToolUse") | .hookSpecificOutput.additionalContext' 2>/dev/null \
@@ -101,11 +91,6 @@ check "not JSON"               silent "$(printf 'nope' | run_hook)"
 
 # The skipped paths above must not spend the session's one line.
 check "a skipped edit doesn't charge" "tack session" "$(edit s8 "$REPO" "$REPO/src/a.sh")"
-
-echo ""
-echo "Silent with no tack CLI to tell:"
-HOOK_PATH="$NOTACK_PATH"
-check "no tack on PATH"        silent "$(edit s11 "$REPO" "$REPO/src/a.sh")"
 
 echo ""
 echo "========================================="

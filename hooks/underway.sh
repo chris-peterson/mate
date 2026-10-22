@@ -43,10 +43,6 @@ state="${TMPDIR:-/tmp}"
 [ -f "$state/mate-tack-heard/$marker" ] && exit 0
 [ -f "$state/mate-tack-underway/$marker" ] && exit 0
 
-# With no tack CLI there is nobody to tell; the skills and the composition guide
-# carry what replaces the envelope by hand.
-command -v tack >/dev/null 2>&1 || exit 0
-
 toplevel=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null || true)
 [ -n "$toplevel" ] || exit 0
 

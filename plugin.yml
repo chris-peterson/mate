@@ -10,6 +10,12 @@ repository: https://github.com/chris-peterson/mate
 keywords: [fix, feature, debugging, tdd, refine, workflow, claude-code]
 license: MIT
 
+# mate has no work of its own to do without the plugins it joins, so Claude Code
+# installs both with it.
+dependencies:
+  - name: anchor
+  - name: tack
+
 validate:
   accept:
     - warning: root
@@ -59,18 +65,15 @@ events:
 # → marketplace SPA; keys mirror the SPA's PLUGINS object.
 suite:
   group: waypoints
-  # Both siblings are optional. mate composes with them and degrades without
-  # them: a bare install still runs both skills start to finish, and the nudge
-  # names a command the user may not have — which reads as a suggestion, which
-  # is all a nudge ever is.
+  # The site's copy of the top-level dependencies, with the reason for each.
   dependencies:
     - name: tack
-      required: false
+      required: true
       reason: opens the envelope each skill starts from and closes it at the end
     - name: anchor
-      required: false
+      required: true
       reason: supplies the backlog, commit, change-request, merge, and release phases the nudge names
-  # Two user-invoked skills, plus hooks that read both shapes a skill
+  # Three user-invoked skills, plus hooks that read both shapes a skill
   # invocation arrives in. Nothing at session start.
   activations: [agent, user]
   gloss: mate plugins to combine capabilities.
