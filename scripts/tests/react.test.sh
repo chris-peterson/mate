@@ -164,7 +164,7 @@ echo "Starts the work tack opened, once per session:"
 STARTED='codes.bridgeai.tack/session.started {"route":"acme-widget"}'
 stdout_case "has the agent start it"   "invoke that skill"        "$STARTED"
 stdout_case "names both skills"        "/mate:feature"            "$STARTED"
-stdout_case "names the route"          'route `acme-widget`'      "$STARTED"
+stdout_case "names the route"          "route \`acme-widget\`"    "$STARTED"
 stdout_case "no route field"           "bound this session to its route" \
   'codes.bridgeai.tack/session.started {}'
 stdout_case "defers to a running skill" "If you are already"      "$STARTED"
