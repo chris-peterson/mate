@@ -92,7 +92,7 @@ Local build success does not predict deployment success. Constraints that only s
 
 Long sessions accumulate context faster than they look like they do, and idle gaps — waiting on CI, reviewing, interruptions — burn it without adding anything. When the session approaches that threshold, say so and propose splitting the work or persisting the decisions to CLAUDE.md before continuing.
 
-**Make the result observable before reporting it.** Give the user a command they can paste and the output it actually produced, rather than a prose summary. Name what the session leaves behind, too: a background server, a scratch directory, a file written outside the tree.
+**Make the result observable before reporting it.** Give the user a command they can paste and the output it actually produced, rather than a prose summary. Run the command before reporting it, and name what the session leaves behind: a background server, a scratch directory, a file written outside the tree.
 
 A draft CR with green checks is a stall, not a finish. Where tack is installed, the close is **`/tack:end`** — it reads what actually landed, records the deliverable against the route, decides whether the session earned a retro, and reports the commands still owed rather than running them. Where it isn't, close by hand: say what landed, what is still owed, and whether the session earned a retro.
 
