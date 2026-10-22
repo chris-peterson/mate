@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
-# The reaction: one line naming what comes next, keyed off what anchor and tack
+# The reaction: one line on what comes next, keyed off what tack and anchor
 # announce rather than off which skill the user ran.
 #
 # The suite's plugins collaborate by printing one self-contained line on stdout,
 # which reaches this hook as `tool_response.stdout`:
 #
-#   codes.bridgeai.anchor/cr.ready {"uri":"https://github.com/o/r/pull/88"}
+#   codes.bridgeai.tack/session.started {"session":"…","route":"acme-widget"}
 #
 # The grammar and the publishing rules are the suite's interop contract:
 # https://github.com/chris-peterson/claude-marketplace/blob/main/authoring/plugin-contract.md
 #
 # Three keys are read, each for something a skill-name match cannot supply.
 #
-# `codes.bridgeai.tack/session.started` says tack has heard of this session,
-# which nothing else mate sees can establish. It marks the session so
-# underway.sh and the push line below stop pressing for a binding, and it is
-# the moment work opens on a route, so its line has the agent classify that
-# work and start it. That is the one line here that invokes rather than names,
-# because opening the envelope is asking for the work inside it.
+# `codes.bridgeai.tack/session.started` is tack saying it has opened work on a
+# route. tack owns starting work, so mate listens for it rather than asking the
+# user to call a mate command, and has the agent classify the work and start
+# /mate:fix or /mate:feature. That is the one line here that invokes rather than
+# names, because opening the envelope is asking for the work inside it. A bind
+# the agent runs by hand announces it too.
 #
 # `commit.pushed` carries the sha and the branch, and it is announced only once
-# the push has landed — which is downstream of `/anchor:commit`'s own review of
+# the push has landed, which is downstream of `/anchor:commit`'s own review of
 # the pending changeset, where only an `approved` verdict commits and pushes. The
 # announcement is therefore the evidence that the changeset was read, so the line
 # names the step after review rather than another review of it. The branch decides
@@ -28,14 +28,7 @@
 # naming one the session can't open reads as the flow having gone wrong.
 #
 # `cr.ready` carries the change request's URL and the moment it becomes a thing
-# to hand to somebody. Naming the phase after that one is nudge.sh's
-# `anchor:review` case, so that line stops at the handoff. tack records
-# cr.created, cr.updated, cr.merged, issue.created and release.created on the
-# route.
-#
-# Matching what a sibling says rather than the shape of the command it ran is
-# what lets anchor change forge CLIs, or tack reshape its skill, without silently
-# taking these lines out.
+# to hand to somebody.
 #
 # A PostToolUse hook's plain stdout reaches the transcript and never the agent,
 # so the lines are collected and handed over once, as additionalContext. Every
@@ -59,7 +52,7 @@ output=$(printf '%s' "$input" | jq -r '.tool_response.stdout // empty' 2>/dev/nu
 # The JSON body of one announcement, or nothing when that key wasn't announced.
 #
 # Anchored at the start of a line and followed by whitespace, so a command that
-# merely mentions a key — an echo, a grep for it, this comment in a diff —
+# merely mentions a key (an echo, a grep for it, this comment in a diff)
 # doesn't fire, and `cr.readyish` never matches `cr.ready`. The separator is
 # whatever whitespace the publisher used; a tab is as valid as a space, and
 # drops the body if the key is stripped on spaces alone.
@@ -85,15 +78,16 @@ claim() {
 
 # The announcement is for the session that ran the command, so a body naming a
 # different one is a bind made on someone else's behalf. A body that isn't a
-# JSON object isn't tack's announcement, so it neither marks nor speaks.
+# JSON object isn't tack's announcement. Once per session: binding again, or
+# binding a second tack, opens no new work.
 body=$(announced 'tack/session\.started')
 if [ -n "$body" ] \
-  && for_session=$(printf '%s' "$body" | jq -er '.session // ""' 2>/dev/null); then
-  if [ -z "$for_session" ] || [ "$for_session" = "$session_id" ]; then
-    if claim tack-heard "$session_id"; then
-      route=$(printf '%s' "$body" | jq -r '.route // empty' 2>/dev/null || true)
-      if [ -n "$route" ]; then where="route \`$route\`"; else where="its route"; fi
-      say <<MSG
+  && for_session=$(printf '%s' "$body" | jq -er '.session // ""' 2>/dev/null) \
+  && { [ -z "$for_session" ] || [ "$for_session" = "$session_id" ]; } \
+  && claim session-started "$session_id"; then
+  route=$(printf '%s' "$body" | jq -r '.route // empty' 2>/dev/null || true)
+  if [ -n "$route" ]; then where="route \`$route\`"; else where="its route"; fi
+  say <<MSG
 mate: tack has bound this session to ${where}. Once the envelope is open,
 classify the work yourself (read the labels and the description: a defect whose
 cause isn't known yet, or a capability) and start it:
@@ -107,13 +101,7 @@ Say which and why in one sentence, then invoke that skill for the same work and
 carry on with it. If neither fits, say so and start neither. If you are already
 in /mate:fix or /mate:feature, carry on.
 MSG
-    fi
-  fi
 fi
-
-tack_heard() {
-  [ -f "${TMPDIR:-/tmp}/mate-tack-heard/${session_id//[^A-Za-z0-9._-]/_}" ]
-}
 
 body=$(announced 'anchor/commit\.pushed')
 if [ -n "$body" ]; then
@@ -143,22 +131,10 @@ MSG
       say <<MSG
 mate: ${sha} is pushed to ${branch}.
 \`/anchor:commit\` commits only on an approved review, so this changeset has
-already been read once — the next step is \`/anchor:prepare-review\` to open the
+already been read once. The next step is \`/anchor:prepare-review\` to open the
 change request. Name it in the wrap-up; don't run it.
 MSG
     fi
-  fi
-
-  # A pushed commit is the work's first durable artifact, so a session tack
-  # still hasn't heard of is pressed once more here, whatever underway.sh said
-  # at the first edit. Unlike the line above, it needs no default branch.
-  if [ -n "$sha" ] && ! tack_heard && claim tack-pushed "$session_id"; then
-    say <<MSG
-mate: tack still hasn't heard which work ${sha} belongs to. Bind the session now
-so what lands is recorded: \`tack session <slug> ${session_id} --tack <id>\`,
-running \`tack add <slug> "<summary>"\` first when no open tack fits. When no
-route resolves, ask the user whether to run \`/tack:start\`.
-MSG
   fi
 fi
 

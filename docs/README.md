@@ -10,11 +10,12 @@
 
 </div>
 
-mate is the joint the other bridge.ai plugins fit into: it listens for what each
-one announces and names what should run next. Today that is the work where code
-actually changes, a defect whose cause is not known yet and a capability that is
-not there yet, plus one line of forward pressure when a phase begins. You type
-the next command, or you don't.
+mate carries the playbooks for the work where code actually changes: a defect
+whose cause is not known yet, and a capability that is not there yet. When
+[tack](https://github.com/chris-peterson/tack) opens work on an issue, mate has
+the agent decide which playbook fits and start it. And when
+[anchor](https://github.com/chris-peterson/anchor) pushes a commit or takes a
+change request out of draft, mate names what comes next.
 
 ## In action
 
@@ -27,121 +28,79 @@ claude plugin marketplace add chris-peterson/claude-marketplace
 claude plugin install mate@chris-peterson
 ```
 
+Installing mate installs tack and anchor with it.
+
 ## The skills
 
-| | `/mate:next` | `/mate:fix` | `/mate:feature` |
-|---|---|---|---|
-| For | choosing what to work on | a defect whose cause isn't known yet | a capability an existing codebase doesn't have |
-| Triggers on | "what's next?", "what should I work on?" | a stack trace, a CI failure, "works locally but fails in CI" | "add X", a feature request, a spec |
-| The spine | survey → recommend → offer `/tack:start` → wait for your pick | root cause → RED → GREEN → verify → sweep the bug class | constraints → first working implementation → refine against real feedback → consolidate |
-| Skip it when | you've already named the work | the correction is already known and mechanical, or there's no error signal to reason from | the work is a defect, the project is greenfield, or the deliverable is an answer rather than code |
-
-`/mate:next` surveys through `/anchor:backlog`. `fix` and `feature` carry
-reference files the skill loads only when it needs them: the symptom catalog
-and the diagnostic techniques for `fix`, the verification instruments and the
-accumulated patterns catalog for `feature`.
-
-## Nudge, never sequence
-
-A skill that drove these phases end to end was retired in favour of running each
-on its own timing. What went with it by accident was the **forward pressure**:
-knowing which phase you're in and what comes next. mate brings back that half
-and only that half.
-
-| | a sequencer does | mate does |
+| | `/mate:fix` | `/mate:feature` |
 |---|---|---|
-| Phase transitions | runs them back to back with gates | emits one line saying what's next |
-| Who runs the next step | the skill | you, by typing it |
-| Fix vs feature | you pick | mate classifies from the issue |
+| For | a defect whose cause isn't known yet | a capability an existing codebase doesn't have |
+| Triggers on | a stack trace, a CI failure, "works locally but fails in CI" | "add X", a feature request, a spec |
+| The spine | root cause → RED → GREEN → verify → sweep the bug class | constraints → first working implementation → refine against real feedback → consolidate |
+| Skip it when | the correction is already known and mechanical, or there's no error signal to reason from | the work is a defect, the project is greenfield, or the deliverable is an answer rather than code |
 
-Getting into the work is the agent's job, from either end. `/mate:fix 42`
-already says which work to open, so the skill runs `/tack:start` for it instead
-of asking you to type the same reference again. `/tack:start 42` already says
-you want the work started, so once tack binds the session to a route, mate has
-the agent read the issue's labels
-and description, say in one line which skill fits, and run it. Either way you
-come back to a session that is working, not one waiting on you.
+Each carries reference files it loads only when it needs them: the symptom
+catalog and the diagnostic techniques for `fix`, the verification instruments
+and the accumulated patterns catalog for `feature`.
 
-Everything else is a suggestion:
+Neither opens a tack route for a single contained change. Work that spans more
+than one deliverable or more than one session gets one, and `/mate:fix` makes
+that call after it has looked at the failure, not before.
 
-```text
-mate: when this phase is done and the tree is green, the next step is
-`/anchor:commit`. Name it in the wrap-up; don't run it.
-```
+## The kick-off
 
-## The chain it names
+`/tack:start <issue>` opens the work: it reads the issue, cuts a branch, and
+binds the session to a route. When tack announces that binding
+(`session.started`), mate tells the agent to read the issue's labels and
+description, say in one line whether it's a defect or a capability, and start
+`/mate:fix` or `/mate:feature`. You come back to a session that is working.
 
-**`/mate:next`** → `/tack:start` → **`/mate:fix`** or **`/mate:feature`** →
-`/anchor:commit` → `/anchor:prepare-review` → `/anchor:review` →
-`/anchor:merge` → `/anchor:release` → `/tack:end`
+That is the one thing mate does without being asked. tack owns starting work,
+so mate listens for tack saying it happened rather than asking you to call a
+mate command.
 
-mate supplies the three in bold. [tack](https://github.com/chris-peterson/tack)
-and [anchor](https://github.com/chris-peterson/anchor) supply the rest, and
-installing mate installs both. The full contract is in
-[Composing with the siblings](/guides/composing-with-siblings).
+## After a push, and out of draft
 
-## How the nudge reaches you
+Two of anchor's announcements carry a fact the command name can't, and mate
+names the next step from each. It names; you run it or you don't.
 
-A slash command *you* type is expanded into the prompt and fires no `Skill` tool
-call; only an agent-invoked skill produces one. mate registers on both events
-against the same script, so the line arrives whichever way the phase was
-entered.
+- **`commit.pushed`** lands after `/anchor:commit` has pushed, and that skill
+  commits only on an approved review, so the diff has already been read. On a
+  feature branch the next step is `/anchor:prepare-review`. On the default
+  branch there's no change request to open: `/anchor:release` if it ships on its
+  own, otherwise `/tack:end`. Once per commit; an amend is a new one.
+- **`cr.ready`** is the first moment a change request is something to hand to
+  somebody. mate asks for the two things it still needs: a reviewer, and the
+  pipeline's state. Once per session.
 
-Some lines arrive by a different road. The suite's plugins announce what they
-caused on a command's stdout, and mate subscribes to the keys that carry a fact
-a command name can never carry.
+## Why so little
 
-`session.started` is tack saying it has bound this session to a route, which
-is the moment work opens, whether `/tack:start` did the binding or the agent did
-by hand. Its line has the agent classify the work and start `/mate:fix` or
-`/mate:feature`, once per session.
+The command you reach for first says what kind of session this is, and mate
+answers that rather than pulling every session into the same chain:
 
-`commit.pushed` carries the sha and the branch, and lands only once the push
-has. That matters because the nudge fires on *entering* a phase: when you type
-`/anchor:commit`, nothing about that commit has happened yet. By the time the
-announcement arrives, two things are known. The changeset has been read:
-`/anchor:commit` opens the pending diff in a review tool and commits only on an
-approved verdict, so a push is evidence of a review, and recommending another
-one would be asking you to read the same diff twice. And the branch is known,
-which decides what the line can even name: a commit heading for a change request
-gets `/anchor:prepare-review`, while one landed on the default branch has no
-change request to open and gets `/anchor:release` or `/tack:end`.
+| You reach for | You're saying | mate |
+|---|---|---|
+| `/anchor:backlog` | "What should I do, if anything?" | stays out of it. Exploring may end with no work at all |
+| `/anchor:issue` | "Record this", or "is this tracked?" | stays out of it |
+| `/tack:start <issue>` | "I've chosen; set it up" | picks the playbook and starts it |
+| `/mate:feature <x>` | "Build this" | gathers the constraints first, and opens a route if the work is sizable |
+| `/mate:fix <prod issue>` | "It's broken, now" | diagnoses first; bookkeeping waits |
+| a plain question | nothing yet | stays out of it |
 
-`cr.ready` is the first moment the change request is something to hand to
-somebody, and the announcement carries the URL to hand over. So the line asks
-for the two things a CR out of draft still needs: a reviewer and the pipeline's
-state. Naming `/anchor:merge` is already the `/anchor:review` nudge's job, so
-the reaction leaves it alone.
+anchor, tack and mate each work on their own. A session that only browses the
+backlog, or only fixes one bug, uses one of them and that is the whole session.
 
-Everything else anchor announces already lands on a phase the nudge names, and
-[tack](https://github.com/chris-peterson/tack) records the CR, issue and release
-keys on the route, so mate says nothing about them rather than saying it twice.
-
-## Getting tack told
-
-Plenty of work starts from a plain prompt rather than `/tack:start` or a mate
-skill, and that work reaches its commit with tack told nothing, so `/tack:end`
-has nothing to close and the sessions view can't say what the session is on. mate
-listens for tack's `session.started` announcement, which is the evidence tack
-has heard of the session. Until it arrives, two moments draw a line:
-
-| Moment | Why then |
-|---|---|
-| the first edit to a file inside the repo | the earliest point the session is plainly work rather than a question |
-| the first `commit.pushed` | the work now has a durable artifact, whatever was said at the edit |
-
-Each line asks the agent to bind the session to the tack it drives (adding one
-when none fits), or to ask you about `/tack:start` when no route resolves. This
-is one of two places mate asks for something to be done rather than named:
-binding is bookkeeping on the record the work already lives in, not a phase of
-the chain. The other is starting the work tack just opened.
+The rule behind that: each plugin suggests its own next phase, and only when it
+is certain which one it is. A plugin that needs another's events listens to them
+directly. mate covers only the seams no single plugin owns, such as tack opening
+an issue and the playbook that works it, or a playbook finishing and anchor's
+commit. The lines after a push and out of draft are mostly anchor's own chain,
+so they move into anchor once
+[anchor#164](https://github.com/chris-peterson/anchor/issues/164) lands.
 
 ## Why "mate"
 
-To mate two parts is to fit them together so they hold. The bridge.ai plugins
-each announce what they caused, and mate is the joint they fit into: it reads
-those announcements and names what runs next.
-
-Today that joint is narrow. It reaches two of anchor's keys, the phase names the
-nudge resolves from a skill invocation on its own, and the skills where the
-code actually changes. Widening it is the direction the plugin is headed.
+To mate two parts is to fit them together so they hold. mate fits at the
+joints where one plugin's work ends and the next phase begins: an issue tack
+has opened becoming the work that changes the code, and a push or a change
+request anchor has finished becoming the step after it.

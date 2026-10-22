@@ -1,7 +1,7 @@
 {
   "name": "mate",
   "version": "0.2.1",
-  "description": "An event hub for the bridge.ai plugins: reacts to what each one announces, and names what to run next.",
+  "description": "Fix and feature playbooks that start on their own when tack opens an issue.",
   "author": {
     "name": "chris-peterson"
   },

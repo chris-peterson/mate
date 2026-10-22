@@ -24,7 +24,7 @@ Work in the target repo's own working directory. Cross-cwd debugging multiplies 
 
 **On a first contribution to an unfamiliar repo, get a clean build and a green run of the suite you'll extend *before* writing the failing test.** The toolchain pin and the package feed are the two that bite: a `global.json` / `.tool-versions` / lockfile pin the machine doesn't satisfy, and a private feed that 401s on a package the build needs. Run the repo's own bootstrap script (`Start-PSBootstrap`, `bootstrap.sh`, `make setup`) rather than improvising. Discovering either one *between* writing the RED test and running it is the expensive position: the gate that proves the diagnosis is blocked on unrelated infrastructure while the test design is still in flight.
 
-**Before diagnosing, open the envelope yourself.** The user who typed `/mate:fix 42` has already said which work to open, so asking them to retype it as `/tack:start` adds a round trip and stalls a session they may have walked away from. When no route resolves for the session, invoke [tack](https://github.com/chris-peterson/tack)'s `/tack:start` with the work the user named, then carry on: it opens the envelope (the linked thread read in full, a branch, a route) that `/tack:end` later closes. Resolve a bare `<n>` or `#<n>` against the origin remote first (`gh api 'repos/{owner}/{repo}/issues/<n>' --jq .html_url`, `glab issue view <n>`), and pass no URL when the request names none.
+**Diagnose before any bookkeeping.** Someone who reaches for `/mate:fix` usually wants the failure looked at now, and a branch or a route opened first is time they didn't ask to spend. Read the linked issue or thread in full, then go straight to Phase 1. Record the work on [tack](https://github.com/chris-peterson/tack) only once the diagnosis shows it is sizable, meaning more than one deliverable or more than one session: then invoke `/tack:start` with the issue, which opens the envelope (a branch, a route) that `/tack:end` later closes. A route that already resolves for the session is the record. Resolve a bare `<n>` or `#<n>` against the origin remote (`gh api 'repos/{owner}/{repo}/issues/<n>' --jq .html_url`, `glab issue view <n>`).
 
 ## Phase 1 — Establish the bug is real and current (5-10 min)
 
@@ -99,7 +99,9 @@ Cross-reference the originating deliverable when the bug surfaced during other w
 
 **Report the machine state the session leaves behind, separately from the diff.** A toolchain installed side-by-side, a package feed added to unblock a restore, a container left running: any of these can be required to build and still belong nowhere near the commit. Reverting the local workaround is right, and it restores the failure for the next session — so a clean tree is not the same as an unchanged machine. Name what was installed and what was reverted at the close.
 
-The close is **`/tack:end`** — it reads what actually landed, records the fix against the route, decides whether the session earned a retro, and reports the commands still owed rather than running them.
+With the tree green, the next step is **`/anchor:commit`**: name it in the wrap-up rather than running it.
+
+When the work is on a tack route, the close is **`/tack:end`**: it reads what actually landed, records the fix against the route, decides whether the session earned a retro, and reports the commands still owed rather than running them.
 
 ## When it isn't converging
 

@@ -37,7 +37,7 @@ Three questions that only apply sometimes, and each is cheap next to what it pre
 
 ## Phase 1 — Setup and context (5-15 min)
 
-**Before implementing, open the envelope yourself.** The user who typed `/mate:feature 42` has already said which work to open, so asking them to retype it as `/tack:start` adds a round trip and stalls a session they may have walked away from. When no route resolves for the session, invoke [tack](https://github.com/chris-peterson/tack)'s `/tack:start` with the work the user named, then carry on: it opens the envelope (the linked thread read in full, a branch, a route) that `/tack:end` later closes. Resolve a bare `<n>` or `#<n>` against the origin remote first (`gh api 'repos/{owner}/{repo}/issues/<n>' --jq .html_url`, `glab issue view <n>`), and pass no URL when the request names none.
+**Record sizable work on tack before implementing.** A capability that spans more than one deliverable or more than one session needs a record that outlives the session. When it does and no route resolves, invoke [tack](https://github.com/chris-peterson/tack)'s `/tack:start` with the work the user named rather than asking them to type it: it opens the envelope (the linked thread read in full, a branch, a route) that `/tack:end` later closes. A single contained change needs none of that; read the linked issue and start. Resolve a bare `<n>` or `#<n>` against the origin remote (`gh api 'repos/{owner}/{repo}/issues/<n>' --jq .html_url`, `glab issue view <n>`).
 
 Confirm the inputs above, then honor the constraints that prevent false starts. For CI, build, or orchestration config, **check the variable-availability docs for the context the variable sits in**, not just that the variable exists: a variable available in a job may expand to empty in `workflow:name`, `rules:if`, or a trigger job, and the failure is cosmetic-but-confusing rather than loud.
 
@@ -94,7 +94,9 @@ Long sessions accumulate context faster than they look like they do, and idle ga
 
 **Make the result observable before reporting it.** Give the user a command they can paste and the output it actually produced, rather than a prose summary. Run the command before reporting it, and name what the session leaves behind: a background server, a scratch directory, a file written outside the tree.
 
-A draft CR with green checks is a stall, not a finish. The close is **`/tack:end`** — it reads what actually landed, records the deliverable against the route, decides whether the session earned a retro, and reports the commands still owed rather than running them.
+With the tree green, the next step is **`/anchor:commit`**: name it in the wrap-up rather than running it.
+
+A draft CR with green checks is a stall, not a finish. When the work is on a tack route, the close is **`/tack:end`**: it reads what actually landed, records the deliverable against the route, decides whether the session earned a retro, and reports the commands still owed rather than running them.
 
 ## Reference files
 
