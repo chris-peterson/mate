@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
 mate does fewer things: it carries the fix and feature playbooks, starts the
 right one when tack opens an issue, and names the step after anchor's push and
