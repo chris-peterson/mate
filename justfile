@@ -33,11 +33,7 @@ plugin-json:
 describe:
     {{shipyard}} gen-describe
 
-# feed the nudge hook one payload and print what it says back
-nudge PAYLOAD:
-    @printf '%s' '{{PAYLOAD}}' | bash hooks/nudge.sh
-
-# feed the react hook one anchor announcement and print what it says back
+# feed the react hook one announcement and print what it says back
 react ANNOUNCEMENT:
     #!/usr/bin/env bash
     set -euo pipefail

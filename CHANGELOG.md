@@ -2,37 +2,31 @@
 
 ## Unreleased
 
+mate does fewer things: it carries the fix and feature playbooks, starts the
+right one when tack opens an issue, and names the step after anchor's push and
+draft flag.
+
 ### Changed
 
-- Installing mate installs anchor and tack with it. mate joins the phases
-  those two supply, so it now declares both as dependencies, and the skills
-  and hooks always use them.
-- `/tack:start` now gets right to work: the agent decides whether the issue
-  is a defect or a capability and runs `/mate:fix` or `/mate:feature` itself,
-  instead of naming it and waiting for you to type it. The cue comes from tack
-  binding the session to a route, so it also arrives when the agent binds the
-  session by hand.
+- `/tack:start` now gets right to work: once tack binds the session to the
+  issue's route, the agent decides whether the issue is a defect or a
+  capability and runs `/mate:fix` or `/mate:feature` itself, instead of naming
+  it and waiting for you to type it. A bind the agent runs by hand starts it
+  the same way.
+- `/mate:fix` looks at the failure before anything else. It opens a branch and
+  a tack route only once the diagnosis shows the work spans more than one
+  deliverable or session, and `/mate:feature` opens one only for work of that
+  size.
+- Installing mate installs anchor and tack with it.
+- `/mate:fix` and `/mate:feature` name `/anchor:commit` in their own wrap-up.
 
-### Added
+### Removed
 
-- `/mate:next` picks your next piece of work: it surveys the issues assigned
-  to you through `/anchor:backlog`, recommends the top one, and offers
-  `/tack:start` with its URL filled in. It starts that issue, or another one,
-  once you say which. Typing `/anchor:backlog` yourself ends with the same
-  offer.
-- Work that didn't start from `/tack:start`, `/mate:fix` or `/mate:feature`
-  still gets recorded on tack: the first edit inside the repo, and the first
-  push, each ask the agent to bind the session to a tack until tack reports it
-  has heard of the session.
-
-### Fixed
-
-- The nudge works under macOS's built-in bash 3.2, where it printed nothing
-  for any phase.
-- The lines mate prints after a tool call now reach the agent: the step after
-  `/anchor:commit`'s push, what a change request needs once it leaves draft,
-  and the next phase when the agent (rather than you) invokes a skill. Each
-  used to land in the transcript only.
+- The line on entering each phase (`/anchor:prepare-review`, `/anchor:review`,
+  `/anchor:merge`, `/anchor:release`, `/code-review`). The lines after a push
+  and after a change request leaves draft stay.
+- `/mate:next`, and the `/tack:start` offer at the end of `/anchor:backlog`:
+  exploring the backlog is left to anchor.
 
 ## 0.2.1
 

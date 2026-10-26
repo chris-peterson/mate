@@ -4,14 +4,15 @@
 
 name: mate
 version: 0.2.1
-description: "An event hub for the bridge.ai plugins: reacts to what each one announces, and names what to run next."
+description: "Fix and feature playbooks that start on their own when tack opens an issue."
 author: chris-peterson
 repository: https://github.com/chris-peterson/mate
 keywords: [fix, feature, debugging, tdd, refine, workflow, claude-code]
 license: MIT
 
-# mate has no work of its own to do without the plugins it joins, so Claude Code
-# installs both with it.
+# The hook listens for both plugins' announcements and names their commands, and
+# the skills open a tack route for sizable work, so Claude Code installs both
+# with mate.
 dependencies:
   - name: anchor
   - name: tack
@@ -29,41 +30,34 @@ marketplace:
   category: development
   homepage: https://chris-peterson.github.io/mate/#/
 
-# mate publishes nothing: it causes no artifact a sibling could act on. What it
-# hears is three keys, each one a fact the nudge's skill-name match cannot reach.
-# anchor's remaining events arrive at a phase the nudge already names from the
-# skill that emits them, and tack records cr.created, cr.updated, cr.merged,
-# issue.created and release.created on the route — a second line about either
-# would be noise, not forward pressure.
+# mate publishes nothing: it causes no artifact a sibling could act on. It hears
+# the keys that join two plugins. The two anchor keys mostly name steps inside
+# anchor's own chain and move into anchor with anchor#164; until then mate
+# carries them.
 events:
   subscribes:
     - key: codes.bridgeai.anchor/commit.pushed
       handled_by: hooks/react.sh
       reason: >-
-        the nudge fires on entering a phase, so it knows nothing about how the
-        commit ends. This lands after the push, which is downstream of the
-        commit's own review gate — only an approved verdict commits and pushes,
-        so the announcement is itself evidence the diff was read, and the line
-        can name the step after review instead of another review. It also
-        carries the branch, which is what decides whether there is a change
-        request to open at all
+        it lands after the push, which is downstream of the commit's own review
+        gate. Only an approved verdict commits and pushes, so the announcement
+        is itself evidence the diff was read, and the line can name the step
+        after review instead of another review. It also carries the branch,
+        which is what decides whether there is a change request to open at all
     - key: codes.bridgeai.anchor/cr.ready
       handled_by: hooks/react.sh
       reason: >-
         the draft flag coming off is the first moment the change request is
         something to hand to somebody, and the announcement carries the URL to
-        hand over — which the skill-name match never has
+        hand over
     - key: codes.bridgeai.tack/session.started
       handled_by: hooks/react.sh
       reason: >-
-        it is the one evidence mate can see that tack has heard of this
-        session. Until it arrives, the first edit inside the repo and the first
-        push each press once for the session to be bound to a tack, so work
-        that never started from /tack:start or a mate skill still lands on the
-        record. When it does arrive, work has just opened on a route, so the
-        line has the agent classify that work and start /mate:fix or
-        /mate:feature. Matching the announcement rather than the name of tack's
-        skill leaves tack free to rename or reshape the skill
+        tack owns starting work, and this is tack saying a session has just
+        been bound to a route. The line has the agent classify that work and
+        start /mate:fix or /mate:feature, so opening an issue with /tack:start
+        is all it takes. Listening for the announcement rather than the name of
+        tack's skill leaves tack free to rename or reshape the skill
 
 # → marketplace SPA; keys mirror the SPA's PLUGINS object.
 suite:
@@ -72,27 +66,25 @@ suite:
   dependencies:
     - name: tack
       required: true
-      reason: opens the envelope each skill starts from and closes it at the end
+      reason: announces when work opens on an issue, and records the work that spans more than one deliverable
     - name: anchor
       required: true
-      reason: supplies the backlog, commit, change-request, merge, and release phases the nudge names
-  # Three user-invoked skills, plus hooks that read both shapes a skill
-  # invocation arrives in. Nothing at session start.
+      reason: announces a push and a change request leaving draft, and supplies the commands mate names after each
+  # Two user-invoked skills, and one hook that starts them when tack opens work
+  # and names the step after anchor's push and draft flag. Nothing at session
+  # start.
   activations: [agent, user]
   gloss: mate plugins to combine capabilities.
-  pitch: "Plugins that each do their own thing? mate carries what one announces into what runs next."
-  what: "mate is the joint the other bridge.ai plugins fit into: it listens for what each one announces and names what should run next. Today that is the work where code actually changes, a defect whose cause is not known yet and a capability that is not there yet, plus one line of forward pressure when a phase begins. You type the next command, or you don't."
+  pitch: "Opened an issue with tack? mate decides whether it's a fix or a feature and starts it."
+  what: "mate carries the playbooks for the work where code actually changes: a defect whose cause is not known yet, and a capability that is not there yet. When tack opens work on an issue, it has the agent decide which playbook fits and start it. And when anchor pushes a commit or takes a change request out of draft, it names what comes next. It acts only where the command you ran already says what you want."
   # >>> shipyard:describe — generated from source by `shipyard gen-describe`; do not edit >>>
   describe:
     skills:
       feature: Add a capability to an existing codebase — gather the constraints that prevent false starts, implement one feature at a time against the repo's existing patterns, verify each against real feedback, then consolidate before merge.
       fix: Diagnose a bug whose cause isn't known yet — root-cause it, prove the fix against something that failed before it (a new test, or the CI run that already did), then sweep for the same bug class.
-      next: Pick the next piece of work and put it one confirmation away from started.
     hooks:
-      hooks: 'Hook wiring: PostToolUse→nudge (Skill), react (Bash), underway (Edit|Write|NotebookEdit); UserPromptSubmit→nudge.'
-      nudge: PostToolUse / UserPromptSubmit — Names the phase that follows the one just entered, as one line the user acts on or ignores.
-      react: PostToolUse — Starts the work tack just bound the session to, names what a change request still needs once anchor reports the draft flag came off, and presses for a tack binding when a push lands before tack has heard of the session.
-      underway: PostToolUse — Presses for the session to be bound to a tack on its first edit inside the repo, when tack hasn't heard of the session yet.
+      hooks: 'Hook wiring: PostToolUse→react (Bash).'
+      react: PostToolUse — Starts /mate:fix or /mate:feature once tack opens work on a route, and names the step after anchor's push and draft flag.
   # <<< shipyard:describe <<<
   examples:
     - label: "Opening work on an issue"
@@ -101,18 +93,18 @@ suite:
         - { t: you, text: "/tack:start https://github.com/acme/api/issues/412" }
         - { t: claude, text: "Route opened. The issue is labelled `bug` and the description has a stack trace with no known cause — that's a defect, so `/mate:fix` is the fit rather than `/mate:feature`. Starting it now." }
         - { t: status, text: "mate classified it and the agent started /mate:fix" }
-    - label: "Finishing a fix"
+    - label: "Fixing a production issue"
       ac: "--green"
       frames:
         - { t: you, text: "/mate:fix the 500 on empty POST bodies" }
-        - { t: claude, text: "RED confirmed (3 tests fail against current code) → GREEN. Root cause: payload validation is skipped when Content-Length is 0. Swept four sibling handlers; one had the same gap. Next step when you're ready: `/anchor:commit`." }
-        - { t: status, text: "the next phase is named, not run" }
+        - { t: claude, text: "RED confirmed (3 tests fail against current code) → GREEN. Root cause: payload validation is skipped when Content-Length is 0. Swept four sibling handlers; one had the same gap." }
+        - { t: status, text: "diagnosed first; no branch or route opened for a one-commit fix" }
   session:
-    - { t: you, text: "why is the nightly job red only on arm64" }
-    - { t: claude, text: "That's a defect with no known cause and no route open for this session." }
-    - { t: event, text: "mate names the skill: /mate:fix" }
-    - { t: cmd, cmd: "/mate:fix", out: "diagnosis → fix → the arm64 job passes → sweep · next: /anchor:commit" }
-    - { t: note, text: "Every line mate emits is a suggestion. Nothing here ran a phase on its own." }
+    - { t: you, text: "/tack:start https://github.com/acme/api/issues/412" }
+    - { t: event, text: "tack opens the route and announces session.started" }
+    - { t: claude, text: "The issue has a stack trace and no known cause, so it's a defect. Starting /mate:fix." }
+    - { t: cmd, cmd: "/mate:fix", out: "diagnosis → fix → the failing job passes → sweep" }
+    - { t: note, text: "mate's one automatic move: picking the playbook once tack has opened the work." }
 
 docs:
   code_languages: [bash, json, yaml, markdown]

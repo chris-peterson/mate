@@ -1,8 +1,9 @@
 # mate specification
 
-mate names the next phase of a bridge.ai workflow as one line, on entering a
-phase or when a sibling plugin announces what it did, and never runs that phase
-itself.
+mate carries the playbooks for a defect and a capability, starts the one that
+fits when tack opens work on an issue, and names the step after anchor's push
+and draft flag. It acts only where the command the user ran already says what
+they want.
 
 Requirements use [EARS syntax](https://alistairmavin.com/ears). Each is one of:
 Ubiquitous (`The <system> shall …`), State-Driven (`While …`), Event-Driven
@@ -14,18 +15,12 @@ below its category's heading, so every requirement has a linkable anchor
 
 ## Concepts
 
-- **Nudge**: one line naming the next phase, emitted on entering the current
-  one. Not a gate, not a prompt, not an invocation.
-- **Both shapes**: the two ways a skill invocation reaches a hook. A `Skill`
-  tool call when the agent invokes it (`PostToolUse`), and a prompt headed with
-  `/name` when the user types it (`UserPromptSubmit`).
 - **Announcement**: one line a sibling plugin prints on a command's stdout,
   `codes.bridgeai.<plugin>/<key> {json}`, per the suite's interop contract.
-- **The chain**: `/mate:next` → `/tack:start` → `/mate:fix` or
-  `/mate:feature` → `/anchor:commit` → `/anchor:prepare-review` →
-  `/anchor:review` → `/anchor:merge` → `/anchor:release` → `/tack:end`.
 - **The envelope**: what `/tack:start` opens and `/tack:end` closes: the linked
   thread read in full, a slug, a branch, and the tack route.
+- **Sizable work**: work that spans more than one deliverable or more than one
+  session, and so needs a record that outlives the session.
 
 ## Requirements
 
@@ -44,66 +39,39 @@ exit 0.
 While deciding whether a payload is for mate, the hooks shall use only bash and
 `jq`, with no network call.
 
-#### `HOOK-04`
-The nudge shall compute each line from the current payload alone, keeping no
-session state.
-
-#### `HOOK-05`
-Every line mate prints shall name the next step and tell the agent not to run
-it, except the `TRACK` lines, which ask for the tack binding to be done, and
-the `session.started` line (`REACT-08`), which has the agent start the work.
-
 #### `HOOK-06`
 When a hook prints a line from a `PostToolUse` event, it shall print it as
 `hookSpecificOutput.additionalContext` JSON, the only `PostToolUse` output that
 reaches the agent.
 
-### `NUDGE`
-Phase nudges
+### `SKILL`
+The fix and feature skills
 
-#### `NUDGE-01`
-When the agent invokes a skill, the nudge shall read the skill name from the
-`Skill` tool call.
+#### `SKILL-01`
+Where the work is sizable and no route resolves, each skill shall invoke
+`/tack:start` with the work the user named; otherwise it shall start without
+opening a route.
 
-#### `NUDGE-02`
-When the user submits a prompt whose first line starts with `/<name>`, the nudge
-shall read the name from that token, and a command mentioned later in the
-prompt shall not match.
+#### `SKILL-03`
+`/mate:fix` shall prove the fix with a check that fails before it and passes
+after: a test it writes, or the failing run that reported the defect.
 
-#### `NUDGE-05`
-When `/mate:fix` or `/mate:feature` is entered, the nudge shall name
-`/anchor:commit`.
+#### `SKILL-04`
+`/mate:fix` shall sweep for the same bug class before shipping.
 
-#### `NUDGE-06`
-When `/code-review` is entered, the nudge shall name `/anchor:prepare-review`.
+#### `SKILL-05`
+`/mate:feature` shall implement one feature at a time.
 
-#### `NUDGE-07`
-When `/anchor:prepare-review` is entered, the nudge shall name `/anchor:review`
-as a self-review of the draft.
+#### `SKILL-06`
+Each skill shall name the next phase in its wrap-up rather than invoke it.
 
-#### `NUDGE-08`
-When `/anchor:review` is entered, the nudge shall name `/anchor:merge`.
+#### `SKILL-07`
+When the check that proves a fix is a run that already existed, `/mate:fix`
+shall report it as that run failing and then passing, without the RED and GREEN
+labels.
 
-#### `NUDGE-09`
-When `/anchor:merge` is entered, the nudge shall name `/anchor:release`.
-
-#### `NUDGE-10`
-When `/anchor:release` is entered, the nudge shall name `/tack:end`.
-
-#### `NUDGE-11`
-When `/anchor:commit` is entered, the nudge shall print nothing.
-
-#### `NUDGE-12`
-The nudge shall match bare skill names only for `code-review`, `fix`, and
-`feature`.
-
-#### `NUDGE-13`
-When `/anchor:backlog` is entered, the nudge shall ask the agent to end its
-reply by offering `/tack:start` with the recommended issue's URL, and to run
-nothing until the user picks.
-
-#### `NUDGE-14`
-When `/tack:start` is entered, the nudge shall print nothing.
+#### `SKILL-08`
+`/mate:fix` shall start diagnosing before it opens a branch or a route.
 
 ### `REACT`
 Reactions to announcements
@@ -144,71 +112,4 @@ already in one. It shall do so once per session.
 
 #### `REACT-09`
 If a `session.started` body is not a JSON object, then the react hook shall
-neither mark the session nor print.
-
-
-### `TRACK`
-Getting tack told about work already underway
-
-#### `TRACK-01`
-When tack announces `session.started` for the current session, or with no
-session field, the react hook shall mark the session as heard by tack.
-
-#### `TRACK-02`
-When the agent first edits a file under the session's cwd in a git repo, while
-tack hasn't been heard for the session, the underway hook shall ask the agent to
-bind the session to a tack, naming `tack session` with the session id, and to
-ask the user about `/tack:start` when no route resolves.
-
-#### `TRACK-03`
-When anchor announces `commit.pushed` with a sha while tack hasn't been heard
-for the session, the react hook shall ask the agent to bind the session to a
-tack, whatever the branch.
-
-#### `TRACK-04`
-Each `TRACK` line shall be printed at most once per session per hook.
-
-#### `TRACK-06`
-If the edited file lies outside the session's cwd, or the cwd isn't in a git
-repo, then the underway hook shall print nothing and leave its once-per-session
-line unspent.
-
-### `SKILL`
-The fix and feature skills
-
-#### `SKILL-01`
-When no route resolves, each skill shall invoke `/tack:start` with the work the
-user named and continue.
-
-#### `SKILL-03`
-`/mate:fix` shall prove the fix with a check that fails before it and passes
-after: a test it writes, or the failing run that reported the defect.
-
-#### `SKILL-04`
-`/mate:fix` shall sweep for the same bug class before shipping.
-
-#### `SKILL-05`
-`/mate:feature` shall implement one feature at a time.
-
-#### `SKILL-06`
-Each skill shall name the next phase in its wrap-up rather than invoke it.
-
-#### `SKILL-07`
-When the check that proves a fix is a run that already existed, `/mate:fix`
-shall report it as that run failing and then passing, without the RED and GREEN
-labels.
-
-### `NEXT`
-The next skill
-
-#### `NEXT-01`
-`/mate:next` shall survey the work through `/anchor:backlog` and keep its
-ranking.
-
-#### `NEXT-02`
-`/mate:next` shall end by offering `/tack:start` with the top pick's URL, and
-shall start nothing until the user picks.
-
-#### `NEXT-03`
-If the survey finds no issues, then `/mate:next` shall say so and offer to widen
-the scope, starting nothing.
+print nothing.
