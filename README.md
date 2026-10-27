@@ -16,6 +16,9 @@ claude plugin marketplace add chris-peterson/claude-marketplace
 claude plugin install mate@chris-peterson
 ```
 
+mate needs tack and anchor installed too; see
+[Install](https://chris-peterson.github.io/mate/#/?id=install).
+
 ## Development
 
 See [AGENTS.md](./AGENTS.md).

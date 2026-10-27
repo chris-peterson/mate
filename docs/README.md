@@ -25,10 +25,13 @@ change request out of draft, mate names what comes next.
 
 ```bash
 claude plugin marketplace add chris-peterson/claude-marketplace
+claude plugin install tack@chris-peterson
+claude plugin install anchor@chris-peterson
 claude plugin install mate@chris-peterson
 ```
 
-Installing mate installs tack and anchor with it.
+mate needs tack and anchor, from this marketplace or any other that carries
+them.
 
 ## The skills
 

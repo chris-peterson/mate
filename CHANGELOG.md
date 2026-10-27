@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- mate loads when anchor or tack comes from a marketplace other than
+  `chris-peterson`, such as one that proxies it. It used to stay disabled with
+  `Dependency "anchor@chris-peterson" is not installed`.
+
+### Changed
+
+- Installing mate no longer installs anchor and tack. Install both yourself,
+  from any marketplace that carries them.
+
 ## 0.3.0
 
 mate does fewer things: it carries the fix and feature playbooks, starts the

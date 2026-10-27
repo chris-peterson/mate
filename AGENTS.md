@@ -95,9 +95,10 @@ what picks the level.
   plain stdout in the transcript alone, so the line goes out as
   `{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":…}}`.
   The tests decode that JSON and fail on anything else.
-- **anchor and tack are dependencies.** `plugin.yml` declares both, so Claude
-  Code installs them with mate, and the hook and skills name their commands and
-  read their announcements without a branch for their absence.
+- **anchor and tack are required, and installed by the user.** The hook and
+  skills name their commands and read their announcements without a branch for
+  their absence. `plugin.yml` keeps its `dependencies:` block commented out,
+  with the reason and the condition for restoring it beside the block.
 
 ## Glossary
 

@@ -10,12 +10,15 @@ repository: https://github.com/chris-peterson/mate
 keywords: [fix, feature, debugging, tdd, refine, workflow, claude-code]
 license: MIT
 
-# The hook listens for both plugins' announcements and names their commands, and
-# the skills open a tack route for sizable work, so Claude Code installs both
-# with mate.
-dependencies:
-  - name: anchor
-  - name: tack
+# mate needs anchor and tack, but doesn't declare them: Claude Code resolves a
+# bare dependency name in mate's own marketplace only, so a sibling installed
+# from a marketplace that proxies it (getty-claude-marketplace carries anchor)
+# leaves mate disabled with `Dependency "anchor@chris-peterson" is not
+# installed`. Restore the block once every marketplace that carries mate also
+# carries both siblings. suite.dependencies keeps them on the site.
+# dependencies:
+#   - name: anchor
+#   - name: tack
 
 validate:
   accept:
@@ -62,7 +65,7 @@ events:
 # → marketplace SPA; keys mirror the SPA's PLUGINS object.
 suite:
   group: waypoints
-  # The site's copy of the top-level dependencies, with the reason for each.
+  # The siblings mate needs installed, with the reason for each.
   dependencies:
     - name: tack
       required: true
