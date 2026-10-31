@@ -25,7 +25,7 @@ hooks/react.sh          the reactions to tack's and anchor's announcements
 skills/fix/             the defect skill and its reference files
 skills/feature/         the capability skill and its reference files
 scripts/tests/          bash test suite
-docs/                   docsify site (README, _sidebar, favicon are source)
+docs/                   docsify site (README, _sidebar are source)
 ```
 
 `.claude-plugin/plugin.json`, `hooks/hooks.json`, `plugin.yml`'s

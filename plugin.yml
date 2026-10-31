@@ -7,6 +7,7 @@ version: 0.3.1
 description: "Fix and feature playbooks that start on their own when tack opens an issue."
 author: chris-peterson
 repository: https://github.com/chris-peterson/mate
+icon: .claude-plugin/icon.svg
 keywords: [fix, feature, debugging, tdd, refine, workflow, claude-code]
 license: MIT
 
