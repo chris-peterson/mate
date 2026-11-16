@@ -77,8 +77,11 @@ labels.
 Reactions to announcements
 
 #### `REACT-01`
-The react hook shall match an announcement only at the start of a line and
-followed by whitespace.
+The react hook shall hold to the bridge.ai suite contract's `SUB` and `SWITCH`
+requirements
+([SPEC.md](https://github.com/chris-peterson/claude-marketplace/blob/main/SPEC.md)),
+with `mate.subscribe.<publisher>` and
+`mate.subscribe.<publisher>.<entity>-<event>` as its switches.
 
 #### `REACT-02`
 When anchor announces `commit.pushed` on a branch other than the default, the

@@ -7,4 +7,4 @@ hooks:
   - event: PostToolUse
     matcher: Bash
     command: 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/react.sh"'
-    description: Starts /mate:fix or /mate:feature once tack opens work on a route, and names the step after anchor's push and draft flag.
+    description: Starts /mate:fix or /mate:feature once tack opens work on a route, and names the step after anchor's push and draft flag. Turn a reaction off with `git config mate.subscribe.<plugin>.<entity>-<event> false`, or every one from a plugin with `mate.subscribe.<plugin> false`.

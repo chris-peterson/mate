@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Each of mate's reactions can be turned off. `git config --global
+  mate.subscribe.anchor false` turns off what it says after anchor's
+  announcements, `mate.subscribe.tack false` after tack's, and
+  `mate.subscribe.<plugin>.<entity>-<event>` one at a time, such as
+  `mate.subscribe.anchor.cr-ready`. Set without `--global` in a repository
+  where it doesn't fit. Each line ends with the command that turns it off.
+
+### Fixed
+
+- mate no longer reacts to a `cr.ready` line whose body isn't JSON.
+- A control character in an announced URL, branch, sha, or route no longer
+  reaches the agent.
+
 ## 0.3.1
 
 ### Fixed
