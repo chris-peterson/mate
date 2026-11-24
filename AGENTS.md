@@ -24,6 +24,7 @@ hooks/hooks.yml         source of record for the hook registration
 hooks/react.sh          the reactions to tack's and anchor's announcements
 skills/fix/             the defect skill and its reference files
 skills/feature/         the capability skill and its reference files
+guides/                 reference both skills read at runtime
 scripts/tests/          bash test suite
 docs/                   docsify site (README, _sidebar are source)
 ```

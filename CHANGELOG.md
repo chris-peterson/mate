@@ -10,9 +10,16 @@
   `mate.subscribe.<plugin>.<entity>-<event>` one at a time, such as
   `mate.subscribe.anchor.cr-ready`. Set without `--global` in a repository
   where it doesn't fit. Each line ends with the command that turns it off.
+- `/mate:fix` and `/mate:feature` label the session in beacon with the issue's
+  subject once they've read it, in place of the command that opened it, such
+  as `Mate feature 142`. A session bound to a tack route keeps tack's label.
 
 ### Fixed
 
+- `/mate:fix` and `/mate:feature` no longer repeat a bare issue number such
+  as `#42` back to the console. They look it up on the origin remote first and
+  write it as a link, so it stays clickable wherever it lands, beacon's sessions
+  view included.
 - mate no longer reacts to a `cr.ready` line whose body isn't JSON.
 - A control character in an announced URL, branch, sha, or route no longer
   reaches the agent.

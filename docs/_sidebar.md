@@ -2,6 +2,8 @@
 - Skills
   - [fix](/skills/fix)
   - [feature](/skills/feature)
+- Guides
+  - [Name the work](/guides/name-the-work)
 - [Hooks](/hooks)
 - [Requirements](/spec)
 - [Coverage](/status)
