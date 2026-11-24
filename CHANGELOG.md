@@ -13,6 +13,12 @@
 - `/mate:fix` and `/mate:feature` label the session in beacon with the issue's
   subject once they've read it, in place of the command that opened it, such
   as `Mate feature 142`. A session bound to a tack route keeps tack's label.
+- `/mate:fix` now also starts when a failure is about to be dismissed as
+  "pre-existing", "unrelated", or "already broken on main". It still
+  diagnoses a failure the base branch shares, comparing the two by which
+  tests fail and how, not by whether both pipelines are red. Two red
+  pipelines can fail for different reasons. Whether a failure predates your
+  change decides where its fix goes, never whether there is one.
 
 ### Fixed
 
