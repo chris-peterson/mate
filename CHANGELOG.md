@@ -20,6 +20,12 @@
   as `#42` back to the console. They look it up on the origin remote first and
   write it as a link, so it stays clickable wherever it lands, beacon's sessions
   view included.
+- `/mate:fix` no longer loses your fix when it proves the new tests catch the
+  bug. To show this, it briefly swaps the old, buggy code back in and runs the
+  tests. It used to undo that swap with a git command that reset the file to
+  the last commit, so a fix you hadn't committed yet was erased, and in Claude
+  Code's auto mode the command could be blocked, leaving the buggy code in
+  place. It now saves a copy of the fixed file first and puts that copy back.
 - mate no longer reacts to a `cr.ready` line whose body isn't JSON.
 - A control character in an announced URL, branch, sha, or route no longer
   reaches the agent.

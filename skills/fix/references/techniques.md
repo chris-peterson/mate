@@ -16,16 +16,19 @@ Link whatever is found in the change request so reviewers see the whole causal c
 
 The labels belong to a test the session wrote. When the failing check was a CI job or a build that already existed, restate it as that job failing and then passing, with both run links, rather than as RED and GREEN.
 
-**Provable retroactively.** When asked "if you comment out the fix, do the new tests fail?", answer with evidence. Restore only the production file to its pre-fix state, run the new tests, watch the intended cases fail, then restore:
+**Provable retroactively.** When asked "if you comment out the fix, do the new tests fail?", answer with evidence. Set the fixed file aside, put the pre-fix version in its place, run the new tests, watch the intended cases fail, then copy the fix back:
 
 ```bash
-git show HEAD~1:<file> > <file>
+cp <file> /tmp/<basename>.fixed
+git show <pre-fix-rev>:<file> > <file>   # HEAD if the fix is uncommitted, HEAD~1 if it's the last commit
 # run the new tests — they should fail
-git checkout HEAD -- <file>
+cp /tmp/<basename>.fixed <file>
 # re-run — green
 ```
 
 The tests stay in place; only the fix rolls back. Done once on demand, it turns a fix-now review comment into a settled verification in about 30 seconds.
+
+**Restore by copy, never by a git command that discards.** `git checkout HEAD -- <file>` puts back what HEAD holds, which is the pre-fix code whenever the fix isn't committed yet, so it erases the fix it was meant to restore. And from Claude Code 2.1.329, auto mode can block a discarding git command until it has checked the working tree, which stops the run with the pre-fix code still in place. A copy does neither: if any step is refused, the fix is either still in `<file>` or waiting at `/tmp/<basename>.fixed`. Keep the copy in a literal path rather than a shell variable, since each Bash call starts a new shell.
 
 **Label honestly.** Revert-and-confirm proves the tests are load-bearing. It does not make the work tests-first if the fix and tests were written together. Both are legitimate — say which one happened.
 
