@@ -78,9 +78,9 @@ Verify each iteration in the environment that actually fails. For CI-only bugs, 
 
 ## Phase 4 — Verify (5-10 min)
 
-1. **Pre-existing is a finding, not a verdict.** A failure that also reproduces on the base still gets diagnosed. Whether it predates the change decides where its fix goes (this branch, a separate change request, an issue against the repo that owns it), never whether there is one.
-   - **Compare by failing test, never by pipeline status.** Two red pipelines can fail for different reasons. `git stash -u` (or check out the base), re-run exactly the failing tests through the same script, and diff the failing test names and assertions against this branch's. Only a test that fails the same way on the base is pre-existing; one that fails only here, or here with a different assertion, is this change's. A test name that looks unrelated is not evidence.
-   - **Then diagnose each pre-existing failure as you would your own**, and report it with its cause and where the fix goes. Another team's broken dependency is diagnosed and filed against their repo, not patched from here.
+1. **Diagnose a failure the base shares.** A failure that also reproduces on the base still gets diagnosed and fixed in this session; filing an issue doesn't stand in for the fix. Whether it predates the change decides only where the fix goes: a separate change request against the base, or this branch's work in progress.
+   - **Compare by failing test, never by pipeline status.** Two red pipelines can fail for different reasons. Check out the base the change targets (`git stash -u` reaches it only while the change is uncommitted), re-run exactly the failing tests through the same script, and diff the failing test names and assertions against this branch's. Only a test that fails the same way on the base is pre-existing; one that fails only here, or here with a different assertion, is this change's. A test name that looks unrelated is not evidence.
+   - **Then diagnose and fix each pre-existing failure as you would your own**, and report it with its cause and where the fix went. Where the cause is in another team's repo, the fix is a change request there, not a workaround patched in here.
    - A rebased branch's docs job failed three tests, and `main` was red too, so the agent called all three pre-existing and guessed at stale assets. Run test by test, two came from the branch's own generated assets; only the third, a 404 on another team's site, was on `main`.
 
    Identical reproduction on the base is what earns the "zero new failures" claim.

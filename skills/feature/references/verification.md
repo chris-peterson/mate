@@ -122,15 +122,17 @@ proved the drift guard.
 
 ## Prove a pre-existing failure rather than reasoning about it
 
-Before claiming a failure predates the change, `git stash -u`, re-run exactly
-those tests against the unmodified base, and compare the failing test names and
+Before claiming a failure predates the change, check out the base it targets
+(`git stash -u` reaches it only while the change is uncommitted), re-run exactly
+those tests there, and compare the failing test names and
 assertions, never the two pipelines' status: two red runs can fail for different
 reasons. An identical reproduction is what earns the "not mine" claim; a test
 name that looks unrelated is not.
 
-"Not mine" decides where the fix goes, never whether there is one. Diagnose a
-pre-existing failure with `/mate:fix`, then fix it here, in its own change
-request, or in an issue against the repo that owns it.
+"Not mine" decides only where the fix goes. Diagnose a pre-existing failure
+with `/mate:fix` and fix it in this session, either as part of this branch or
+in a separate change request against the base; filing an issue doesn't stand
+in for the fix.
 
 ## Construct the degraded input rather than reasoning about it
 
