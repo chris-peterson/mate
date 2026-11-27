@@ -4,34 +4,28 @@
 
 ### Added
 
-- Each of mate's reactions can be turned off. `git config --global
-  mate.subscribe.anchor false` turns off what it says after anchor's
-  announcements, `mate.subscribe.tack false` after tack's, and
-  `mate.subscribe.<plugin>.<entity>-<event>` one at a time, such as
-  `mate.subscribe.anchor.cr-ready`. Set without `--global` in a repository
-  where it doesn't fit. Each line ends with the command that turns it off.
+- Each of mate's reactions can be turned off: `git config
+  mate.subscribe.<plugin> false` for every reaction to that plugin, or
+  `mate.subscribe.<plugin>.<entity>-<event> false` for one, such as
+  `mate.subscribe.anchor.cr-ready`. Each line ends with the command that turns
+  it off.
 - `/mate:fix` and `/mate:feature` label the session in beacon with the issue's
-  subject once they've read it, in place of the command that opened it, such
-  as `Mate feature 142`. A session bound to a tack route keeps tack's label.
-- `/mate:fix` now also starts when a failure is about to be dismissed as
-  "pre-existing", "unrelated", or "already broken on main". It still
-  diagnoses a failure the base branch shares, comparing the two by which
-  tests fail and how, not by whether both pipelines are red. Two red
-  pipelines can fail for different reasons. Whether a failure predates your
-  change decides where its fix goes, never whether there is one.
+  subject, unless a tack route already labels it.
+- `/mate:fix` also starts when a failure is about to be dismissed as
+  "pre-existing", "unrelated", or "already broken on main". It checks out the
+  base and compares which tests fail and how, rather than whether both
+  pipelines are red, then fixes a failure the base shares too, in this branch
+  or a separate change request against the base. Filing an issue doesn't count
+  as the fix.
+- mate shows its icon in marketplace catalogs and Anthropic's plugin directory.
 
 ### Fixed
 
-- `/mate:fix` and `/mate:feature` no longer repeat a bare issue number such
-  as `#42` back to the console. They look it up on the origin remote first and
-  write it as a link, so it stays clickable wherever it lands, beacon's sessions
-  view included.
-- `/mate:fix` no longer loses your fix when it proves the new tests catch the
-  bug. To show this, it briefly swaps the old, buggy code back in and runs the
-  tests. It used to undo that swap with a git command that reset the file to
-  the last commit, so a fix you hadn't committed yet was erased, and in Claude
-  Code's auto mode the command could be blocked, leaving the buggy code in
-  place. It now saves a copy of the fixed file first and puts that copy back.
+- `/mate:fix` and `/mate:feature` write an issue number such as `#42` as a
+  link to the issue, so it stays clickable wherever it lands.
+- `/mate:fix` no longer erases an uncommitted fix when it swaps the buggy code
+  back in to prove the new tests catch the bug, and auto mode no longer blocks
+  it from putting the fix back.
 - mate no longer reacts to a `cr.ready` line whose body isn't JSON.
 - A control character in an announced URL, branch, sha, or route no longer
   reaches the agent.
