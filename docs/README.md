@@ -38,7 +38,7 @@ them.
 | | `/mate:fix` | `/mate:feature` |
 |---|---|---|
 | For | a defect whose cause isn't known yet | a capability an existing codebase doesn't have |
-| Triggers on | a stack trace, a CI failure, "works locally but fails in CI" | "add X", a feature request, a spec |
+| Triggers on | a stack trace, a CI failure, "works locally but fails in CI", a failure about to be called "pre-existing" | "add X", a feature request, a spec |
 | The spine | root cause → RED → GREEN → verify → sweep the bug class | constraints → first working implementation → refine against real feedback → consolidate |
 | Skip it when | the correction is already known and mechanical, or there's no error signal to reason from | the work is a defect, the project is greenfield, or the deliverable is an answer rather than code |
 

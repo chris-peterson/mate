@@ -73,6 +73,10 @@ labels.
 #### `SKILL-08`
 `/mate:fix` shall start diagnosing before it opens a branch or a route.
 
+#### `SKILL-09`
+When a failure also reproduces on the base, `/mate:fix` shall still diagnose
+it, deciding that it reproduces by comparing failing tests, not pipeline status.
+
 ### `REACT`
 Reactions to announcements
 
